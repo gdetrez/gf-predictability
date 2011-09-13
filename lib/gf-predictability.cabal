@@ -48,8 +48,11 @@ Cabal-version:       >=1.2
 
 Library
   -- Modules exported by the library.
-  -- Exposed-modules:     
+  Exposed-modules:     GF.Predictability
   
+  -- Directories where the source files are
+  Hs-source-dirs:      src
+
   -- Packages needed in order to build this package.
   -- Build-depends:       
   
