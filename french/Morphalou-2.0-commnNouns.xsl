@@ -13,6 +13,8 @@
   
   <xsl:template match="formSet">
     <xsl:if test="lemmatizedForm/grammaticalCategory = 'commonNoun'">
+	<xsl:value-of select="lemmatizedForm/orthography" />
+	<xsl:text>,</xsl:text>
 	<xsl:value-of select="inflectedForm/orthography[../grammaticalNumber = 'singular']" />
 	<xsl:text>,</xsl:text>
 	
