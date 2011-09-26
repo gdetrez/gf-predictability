@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY % lmf.model.lexiconInformation "originatingData"> 
+<!ENTITY % lmf.model.lexicalEntryDatcats "originatingEntry"> 
+<!ENTITY % lmf.model.lexicalEntryComponents "formSet | sense"> 
+<!ENTITY % lmf.model.lexicalEntryRelations "feminineVariantOf | spellingVariantOf"> 
+<!ENTITY % lmf.model.lemmatizedFormDatcats "frequency | grammaticalCategory | grammaticalGender | inflectionalParadigm | originatingEntry"> 
+<!ENTITY % lmf.model.representationFrame "orthography | pronunciation"> 
+<!ENTITY % lmf.model.inflectedFormDatcats "frequency | grammaticalGender | grammaticalMood | grammaticalNumber | grammaticalPerson | grammaticalTense | originatingEntry"> 
+
+<!--doc:A pointer from a separate entry for a feminine noun to the entry for the corresponding masculine noun. -->
+<!ELEMENT feminineVariantOf (#PCDATA)>
+<!ATTLIST feminineVariantOf target IDREF #IMPLIED>
+
+<!--doc:A /formSet/ (not in LMF) rassembles a unique lemma and all its inflected forms, that is one inflection paradigm. -->
+<!ELEMENT formSet (lemmatizedForm,inflectedForm*)>
+
+<!--doc:normalized frequency of a word form or a lemma, in a given reference corpus -->
+<!ELEMENT frequency (#PCDATA)>
+<!ATTLIST frequency originatingCorpus CDATA #IMPLIED>
+
+<!--doc: -->
+<!ELEMENT grammaticalCategory (#PCDATA)>
+
+<!--doc: -->
+<!ELEMENT grammaticalGender (#PCDATA)>
+
+<!--doc: -->
+<!ELEMENT grammaticalMood (#PCDATA)>
+
+<!--doc: -->
+<!ELEMENT grammaticalNumber (#PCDATA)>
+
+<!--doc: -->
+<!ELEMENT grammaticalPerson (#PCDATA)>
+
+<!--doc: -->
+<!ELEMENT grammaticalTense (#PCDATA)>
+
+<!--doc:A wordform as to be used in context, and to be observed in corpora. An
+                            /inflectedForm/ is characterized by a set of data categories for
+                            inflectional features, and components related to its graphical and
+                            phonetical representation. -->
+<!ELEMENT inflectedForm ((%lmf.model.representationFrame;)*,(%lmf.model.inflectedFormDatcats;)*)>
+<!ATTLIST inflectedForm id ID #IMPLIED>
+
+<!--doc:reference to an inflection class for nouns, adjectives and verbs -->
+<!ELEMENT inflectionalParadigm (#PCDATA)>
+
+<!--doc:This element implements the /lemmatizedForm/ component of the LMF
+                            metamodel. It is refined by customzed data categories as well as members
+                            of the LMF /representationFrame/ class. -->
+<!ELEMENT lemmatizedForm ((%lmf.model.representationFrame;)*,(%lmf.model.lemmatizedFormDatcats;)*)>
+<!ATTLIST lemmatizedForm id ID #IMPLIED>
+
+<!--doc:This element implements the /lexicalEntry/ component of the LMF core metamodel.  -->
+
+<!ELEMENT lexicalEntry ((%lmf.model.lexicalEntryRelations;)*,(%lmf.model.lexicalEntryComponents;)*,(%lmf.model.lexicalEntryDatcats;)*)>
+<!ATTLIST lexicalEntry id ID #IMPLIED>
+
+<!--doc:Implements the LMF /lexicon/ component. Corresponds to the root of the lexical database. -->
+<!ELEMENT lexicon (lexiconInformation,lexicalEntry*)>
+
+<!--doc:Implements the /lexiconInformation/ of LMF. Includes metadata on contributing source databases and institutions. -->
+<!ELEMENT lexiconInformation (%lmf.model.lexiconInformation;)*>
+
+<!--doc:An element for identification of a source database and the responsible institution. -->
+<!ELEMENT originatingData EMPTY>
+<!ATTLIST originatingData originatingDatabase CDATA #IMPLIED originatingInstitution CDATA #IMPLIED>
+
+<!--doc:reference to entries in originating lexical databases, possibly refined by an original POS -->
+<!ELEMENT originatingEntry (#PCDATA)>
+<!ATTLIST originatingEntry target CDATA #IMPLIED originatingCategory CDATA #IMPLIED>
+
+<!--doc:A shortened LMF representation frame for standard orthography (e.g.
+                            Academic French) in a default script (e.g. Latin). Possibility of
+                            specifying syllabification. -->
+<!ELEMENT orthography (#PCDATA)>
+<!ATTLIST orthography processStatus CDATA #IMPLIED script CDATA #IMPLIED syllabification CDATA #IMPLIED>
+
+<!--doc:A particular LMF representation frame for phonetic or phonological
+                            transcription in a specified script and transcription system.
+                            Possibility of specifying syllabification and liaison. -->
+
+<!ELEMENT pronunciation (#PCDATA)>
+<!ATTLIST pronunciation script CDATA #IMPLIED transcription CDATA #IMPLIED syllabification CDATA #IMPLIED liaison CDATA #IMPLIED>
+
+<!--doc:Implements the lmf /sense/ component -->
+<!ELEMENT sense EMPTY>
+
+<!--doc:A pointer from a separate entry for a spelling variant to a main entry -->
+<!ELEMENT spellingVariantOf (#PCDATA)>
+<!ATTLIST spellingVariantOf target IDREF #IMPLIED>

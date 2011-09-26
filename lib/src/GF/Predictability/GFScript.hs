@@ -3,6 +3,7 @@ module GF.Predictability.GFScript where
 import System.Process
 import System.IO
 import Control.Concurrent (forkIO)
+import Control.Exception.Base (evaluate)
 
 -- | Execute a GF script given as an haskell string.
 -- Return an other string containing the output from GF.
@@ -15,7 +16,13 @@ executeGFScript script = do
   -- forkIO (hPutStr inp script)
   hPutStrLn inp script 
   hClose inp
-  out <- hGetContents out
-  -- err <- pipeGetContents errC
+  output <- hGetContents out
+  -- Using evaluate is a trick to force haskell to
+  -- read the output buffer entierly.
+  -- Otherwise, if the string is read lazily, the program can finish
+  -- before we have actually read anything.
+  evaluate $ length output
+  hClose out
+  hClose err
   s <- waitForProcess pid
-  return out
+  return output

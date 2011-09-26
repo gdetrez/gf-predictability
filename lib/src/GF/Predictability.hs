@@ -4,7 +4,7 @@ module GF.Predictability where
 
 import GF.Predictability.GFScript
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
--- import Control.Monad.Trans.Writer (WriterT, runWriterT, tell)
+import Control.Monad.Trans.State (StateT, execStateT, get, put)
 import Control.Monad.Trans.Error (ErrorT, runErrorT)
 import Control.Monad.Trans.Class (lift)
 import Data.Map (Map)
@@ -13,8 +13,11 @@ import Data.Either (rights, lefts)
 import Text.Printf
 import System.Log.Logger
 import System (getArgs)
+import System.IO (Handle, openFile, IOMode(..), hPutStrLn, hClose)
 import System.Console.GetOpt
 import Control.Monad (when)
+import Data.String.Utils (split)
+import Debug.Trace (trace)
 -- ********************************* TESTING ********************************
 import Test.Framework hiding (runTest, Result)
 import Data.List (inits)
@@ -72,6 +75,12 @@ type Lexicon = [LexiconEntry]
 -- skipped.
 type Result = (String, Either String [String])
 
+-- | To avoid consumming too much memory, we don't keep all the result
+-- but aggregate them in a value of the following type:
+data ResultAggregate = ResultAggregate
+   { resultDist :: Map Int Int
+   , errorDist :: Map String Int
+   }
 -- | At the end of the experiment, we compute a summary of the results and
 -- return a value of type Summary.
 data Summary =
@@ -85,6 +94,15 @@ data Summary =
    , getSkippedDist :: Map String Int -- ^ for each skip reason, the number
                                       -- of skipped entries for this reason
    }
+
+-- | The environment represent the global settings in which an experiment is 
+-- ran.
+data Environment = 
+  Environment
+  { envGfLexFileHandle :: Maybe Handle
+  , envDumpFileHandle :: Maybe Handle
+  , envOptions :: Options
+  }
 -- **************************************************************************
 
 -- ******************************** LOGGING *********************************
@@ -126,23 +144,51 @@ mainRunExperiment = mainRunExperiments . (:[])
   
 mainRunExperiments :: [Experiment] -> IO ()
 mainRunExperiments experiments = do
-  args <- getArgs
-  let (optHelpers, nonOpt, msg) = getOpt Permute optDescr args
-      options =
-        (foldl (.) id optHelpers) $ Options Nothing Nothing False False
+  -- First we get the options from command line
+  options <- getOptions
+  -- display a banner in test mode
   when (testMode options) $ 
     putStrLn $ center $ "/!\\/!\\/!\\ TEST MODE /!\\/!\\/!\\"
-  flip mapM_ experiments $ \e -> do
+  
+  environment <- openEnvironment options
+  -- if a list of experiment names is given in the options, we only run the
+  -- corresponding experiments
+  let sel = experimentSelection options
+  flip mapM_ experiments $ \e -> when (length sel < 1 || name e `elem` sel)$do
+    -- in test mode, we test only 100 entry per lexicon
     let experiment = case (testMode options) of
           True -> e { morphLexicon = take 100 $ morphLexicon e}
           False -> e
-    results <- runExperiment options experiment
-    let summary = mkSummary experiment results
+    summary <- runExperiment environment experiment
     pprintSummary summary
-    when (testMode options) $ 
-      putStrLn $ center $ "/!\\/!\\/!\\ TEST MODE /!\\/!\\/!\\"
+  closeEnvironment environment
+  when (testMode options) $ 
+    putStrLn $ center $ "/!\\/!\\/!\\ TEST MODE /!\\/!\\/!\\"
   where center s = take (div (79 - length s) 2) (repeat ' ') ++ s
-
+        getOptions = do  
+          args <- getArgs
+          let (optFuns, nonOpt, msg) = getOpt Permute optDescr args
+          case msg of
+            [] -> return $ 
+             (foldl (.) id optFuns) $ Options Nothing Nothing False False []
+            msgs -> fail $ unlines msgs 
+        openEnvironment :: Options -> IO Environment
+        openEnvironment options = do
+          hDump <- case (dumpFile options) of
+            Nothing -> return Nothing
+            Just path -> openFile path WriteMode >>= return . Just
+          hGFL <- case (gfLexFile options) of
+            Nothing -> return Nothing
+            Just path -> openFile path WriteMode >>= return . Just
+          return $ Environment hGFL hDump options
+        closeEnvironment env = do
+          case envDumpFileHandle env of
+            Nothing -> return ()
+            Just h -> hClose h
+          case envGfLexFileHandle env of
+            Nothing -> return ()
+            Just h -> hClose h
+            
 skip :: String -> Either String a
 skip = Left
 
@@ -150,10 +196,11 @@ skip = Left
 
 -- ***************************** OPTION PARSING *****************************
 data Options = Options 
-  { gfLexFile :: Maybe FilePath
-  , dumpFile :: Maybe FilePath
+  { gfLexFile :: Maybe String
+  , dumpFile :: Maybe String
   , debugOn :: Bool
   , testMode :: Bool
+  , experimentSelection :: [String]
   }
 -- Options declaration
 optDescr :: [OptDescr (Options -> Options)]
@@ -166,35 +213,33 @@ optDescr =
     "enable debug messages"
   , Option ['t'] ["test"] (NoArg (\o -> o {testMode=True})) 
     "Test mode: use only the 100 fist entries from the lexicon (useful for debugging)"
+  , Option ['e'] ["experiments"] (ReqArg (\l o -> o {experimentSelection=split "," l}) "LIST")
+    "Test mode: use only the 100 fist entries from the lexicon (useful for debugging)"
   ]        
 -- **************************************************************************
 
 -- *************************** INTERNAL FUNCTIONS ***************************
 -- | Run an experiment and return a list of results
-runExperiment :: Options -> Experiment -> IO [Result]
-runExperiment opts e = runExp opts e $ do
+runExperiment :: Environment -> Experiment -> IO Summary
+runExperiment environment experiment = runExp environment experiment $ do
     lexicon <- getParam morphLexicon
     test <- getOption testMode
     case test of
       True -> mapM runTest $ take 100 lexicon
       False -> mapM runTest lexicon
 
-mkSummary :: Experiment -> [Result] -> Summary
-mkSummary exp l =  
-  let total = length l
-      valid = length $ rights $ map snd l
-      skipped = total - valid
-      skipDist = mkFreqDist $ lefts $ map snd l
-      table = mkFreqDist $ map length $ rights $ map snd l
-      predictability = avg $ map length $ rights $ map snd l
+mkSummary :: Experiment -> ResultAggregate -> Summary
+mkSummary exp agg =
+  let skipDist = errorDist agg
+      validDist = resultDist agg
+      valid = Map.fold (+) 0 validDist
+      skipped = Map.fold (+) 0 skipDist
+      total = valid + skipped
+      predictability = (Map.foldWithKey f 0 validDist) / fromIntegral valid
+        where f k a b = b + fromIntegral (k * a)
   in
-   Summary exp predictability table skipped skipDist
-     where mkFreqDist :: (Ord a) => [a] -> Map a Int 
-           mkFreqDist = flip foldl Map.empty $ flip (Map.alter inc)
-           inc Nothing = Just 1
-           inc (Just n) = Just $ n + 1
-           avg :: (Fractional f) => [Int] -> f
-           avg l = (fromIntegral $ sum l) / (fromIntegral $ length l)
+   Summary exp predictability validDist skipped skipDist
+
 -- | Pretty printing summaries
 pprintSummary :: Summary -> IO ()
 pprintSummary s = do
@@ -220,19 +265,19 @@ pprintSummary s = do
 
 -- | Run one test (ie. test one entry in the lexicon.)
 runTest :: LexiconEntry    -- ^ The lexicon entry to be tested
-        -> Exp Result
+        -> Exp ()
 runTest (entry,forms) = do
   debug $ "Testing entry: " ++ entry
   setup <- getParam setupFunction
   case setup forms of
     Left s -> do
       debug $ "Skipped: " ++ s
-      return (entry, skip s)
+      putResult (entry, skip s)
     Right fs -> run fs
-  where run :: [[String]] -> Exp Result
+  where run :: [[String]] -> Exp ()
         run [] = do
           debug "\tImpossible !"
-          return (entry, skip "Not found trying all possibilities")
+          putResult (entry, skip "Not found trying all possibilities")
         run (s:ss) = do
           gf_out <- mkScript s >>= runScript >>= return . lines
           debug $ "\tResult: " ++ show gf_out
@@ -240,7 +285,7 @@ runTest (entry,forms) = do
           case test gf_out forms of
             True -> do
               debug "\t↳ OK"
-              return (entry, return s)
+              putResult (entry, return s)
             False -> run ss
 
 -- | Create a GF script that execute the experiment's 'oper' on the given list of forms.
@@ -254,17 +299,22 @@ mkScript forms = do
     , "cc -all " ++ oper ++ " " ++ unwords forms]
 
 runScript :: String -> Exp String
-runScript = lift . executeGFScript
+runScript = lift . lift . executeGFScript
 -- **************************************************************************
 
 -- ****************************** The Exp Monad *****************************
 -- Monad definition
-type Exp a = ReaderT (Options,Experiment) IO a
+type Exp a = ReaderT (Environment,Experiment) (StateT ResultAggregate IO) a
 
 -- Run function
-runExp :: Options -> Experiment -> Exp a -> IO a
-runExp opts exp cpt = runReaderT cpt (opts, exp)
-
+runExp :: Environment
+       -> Experiment   -- ^ Experiment specifications & data
+       -> Exp a        -- ^ Monad computation
+       -> IO Summary
+runExp env exp cpt = do
+  aggregate <- execStateT (runReaderT cpt (env, exp)) 
+               (ResultAggregate Map.empty Map.empty)
+  return $ mkSummary exp aggregate
 -- * Monad functions
 
 
@@ -278,51 +328,74 @@ getParam getP = do
 getOption :: (Options -> a) -> Exp a
 getOption getO = do
   exp <- ask
-  return (getO $ fst exp)
+  return (getO $ envOptions $ fst exp)
 
 -- Print debug message
 debug :: String -> Exp ()
 debug s = do
   on <- getOption debugOn
-  when on $ lift $ putStrLn s
+  when on $ lift $ lift $ putStrLn s
+
+-- manipulating the state
+putResult :: Result -> Exp ()
+putResult r = do
+  -- update state
+  state <- lift get
+  case r of
+    (_, Right l) ->
+      lift $ put $ state { resultDist = Map.alter incr (length l) (resultDist state)}
+    (_, Left e) -> 
+      lift $ put $ state { errorDist = Map.alter incr e (errorDist state)}
+  -- write in dump file
+  env <- ask >>= return . fst
+  case (envDumpFileHandle env, r) of
+    (Nothing,_) -> return ()
+    (Just h, (w, Right fs)) -> do
+      oper <- getParam operName
+      lift $ lift $ hPutStrLn h $ printf "%s: OK (%s %s)" w oper (unwords fs)
+    (Just h, (w, Left e)) ->
+      lift $ lift $ hPutStrLn h $ printf "%s: Skipped (%s)" w e
+  where incr :: Maybe Int -> Maybe Int
+        incr Nothing = Just 1
+        incr (Just n) = Just (n + 1)
 -- **************************************************************************
 
 -- ********************************* TESTING ********************************
-dummyLexiconEntry :: LexiconEntry
-dummyLexiconEntry = ("a", ["a", "b", "c"])
+-- dummyLexiconEntry :: LexiconEntry
+-- dummyLexiconEntry = ("a", ["a", "b", "c"])
 
-dummyExperiment :: Experiment
-dummyExperiment = 
-  Experiment "Test experiment"
-      "tests/gf/DummyParadigm.gf"               
-      "mkDummy"
-      [dummyLexiconEntry]
-      (return . drop 1 . inits)
-      (==)
+-- dummyExperiment :: Experiment
+-- dummyExperiment = 
+--   Experiment "Test experiment"
+--       "tests/gf/DummyParadigm.gf"               
+--       "mkDummy"
+--       [dummyLexiconEntry]
+--       (return . drop 1 . inits)
+--       (==)
 
-dummyOptions :: Options
-dummyOptions = Options Nothing Nothing True False
+-- dummyOptions :: Options
+-- dummyOptions = Options Nothing Nothing True False []
 
-test_runExperiment = do
-  result <- runExp dummyOptions dummyExperiment (return "ok")
-  assertEqual result "ok"
+-- test_runExperiment = do
+--   result <- runExp dummyOptions dummyExperiment (return "ok")
+--   assertEqual result "ok"
 
-test_getParam = do
-  testField name
-  testField gfoFile
-  testField operName
-  testField morphLexicon
-  where testField f = do
-          param <- runExp dummyOptions dummyExperiment (getParam f)
-          assertEqual param (f dummyExperiment)
+-- test_getParam = do
+--   testField name
+--   testField gfoFile
+--   testField operName
+--   testField morphLexicon
+--   where testField f = do
+--           param <- runExp dummyOptions dummyExperiment (getParam f)
+--           assertEqual param (f dummyExperiment)
 
-test_mkScript = do
-  script <- runExp dummyOptions dummyExperiment (mkScript ["a", "c"])
-  let correct = unlines
-        [ "i -retain tests/gf/DummyParadigm.gf"
-        , "cc -all mkDummy \"a\" \"c\""]
-  assertEqual correct script
+-- test_mkScript = do
+--   script <- runExp dummyOptions dummyExperiment (mkScript ["a", "c"])
+--   let correct = unlines
+--         [ "i -retain tests/gf/DummyParadigm.gf"
+--         , "cc -all mkDummy \"a\" \"c\""]
+--   assertEqual correct script
 
-test_runTest = do
-  result <- runExp dummyOptions dummyExperiment (runTest dummyLexiconEntry)
-  assertEqual ("a", Right ["a", "b", "c"]) result
+-- test_runTest = do
+--   result <- runExp dummyOptions dummyExperiment (runTest dummyLexiconEntry)
+--   assertEqual ("a", Right ["a", "b", "c"]) result
