@@ -6,11 +6,11 @@ import GF.Predictability.Utils
 
 -- ************************************ NOUNS *******************************
 testNoun :: TestFunction
-testNoun = (==)
+testNoun = (==) . take 8
 
 setupNoun :: SetupFunction
 setupNoun fs | "" `elem` fs = skip $ "Missing form"
-setupNoun [gurka,gurkas,gurkan,gurkans,gurkor,gurkors,gurkorna,gurkornas,_] =
+setupNoun [gurka,gurkas,gurkan,gurkans,gurkor,gurkors,gurkorna,gurkornas] =
   return [ [ esc gurka ]
          , [ esc gurka, esc gurkor ]
          , [ esc gurka, esc gurkan , esc gurkor, esc gurkorna ] ]

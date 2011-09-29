@@ -11,18 +11,37 @@ import Control.Exception.Base (evaluate)
 -- clean.
 executeGFScript :: String -> IO String
 executeGFScript script = do
-  (inp,out,err,pid) <- runInteractiveCommand "gf -run"
-  hSetBinaryMode inp False
-  -- forkIO (hPutStr inp script)
-  hPutStrLn inp script 
-  hClose inp
-  output <- hGetContents out
-  -- Using evaluate is a trick to force haskell to
-  -- read the output buffer entierly.
-  -- Otherwise, if the string is read lazily, the program can finish
-  -- before we have actually read anything.
-  evaluate $ length output
-  hClose out
-  hClose err
-  s <- waitForProcess pid
-  return output
+  readProcess "gf" ["-run"] script
+  
+  
+  
+  
+  
+  
+  -- --putStrLn "Starting GF"
+  -- (inp,out,_,pid) <- runInteractiveCommand "gf -run"
+  -- hSetBinaryMode inp False
+  -- --putStrLn "Forking"
+  -- forkIO $ do
+  --   hPutStr inp script
+  --   hClose inp
+  -- --putStrLn "Reading GF output"
+  -- output <- hGetContents out
+  
+  -- -- Using evaluate is a trick to force haskell to
+  -- -- read the output buffer entierly.
+  -- -- Otherwise, if the string is read lazily, the program can finish
+  -- -- before we have actually read anything.
+  -- evaluate $ length output
+  
+  -- --hPutStrLn inp script 
+  -- -- putStrLn "Waiting for GF process to terminate"
+  -- waitForProcess pid
+  
+  -- --errors <- hGetContents err
+  -- --evaluate $ length errors
+
+  -- hClose out
+  -- --hClose err
+  -- --s <- waitForProcess pid
+  -- return output

@@ -30,14 +30,12 @@
 	<xsl:value-of select="table/form/wf[../param = 'pl def nom']" />
 	<xsl:text>,</xsl:text>
 	<xsl:value-of select="table/form/wf[../param = 'pl def gen']" />
-	<xsl:text>,</xsl:text>
-	<xsl:choose>
-	  <xsl:when test="inhs = 'u'">CommonScand.Utr</xsl:when>
-	  <xsl:when test="inhs = 'n'">CommonScand.Neutr</xsl:when>
-	  <xsl:otherwise>UNKNOWN</xsl:otherwise>
-	</xsl:choose>
-	<xsl:text>&#xA;</xsl:text>
-	<xsl:value-of select="inhs" />
+	<!-- <xsl:text>,</xsl:text> -->
+	<!-- <xsl:choose> -->
+	<!--   <xsl:when test="inhs = 'u'">CommonScand.Utr</xsl:when> -->
+	<!--   <xsl:when test="inhs = 'n'">CommonScand.Neutr</xsl:when> -->
+	<!--   <xsl:otherwise>UNKNOWN</xsl:otherwise> -->
+	<!-- </xsl:choose> -->
 	<xsl:text>&#xA;</xsl:text>
     </xsl:if>
   </xsl:template>

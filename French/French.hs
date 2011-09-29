@@ -30,6 +30,7 @@ setupAdj fs@[beau,beaux,belle,belles] | "" `elem` fs = skip $ "Missing form"
 setupAdj [beau,beaux,belle,belles] = return
     [ [esc beau]
     , [esc beau, esc belle ] ]
+--    , [esc beau, esc belle, esc beaux ] ]
 setupAdj o = skip $ "Invalid lexicon entry: " ++ show o
 
 -- ********************************** VERBS **********************************
