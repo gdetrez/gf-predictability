@@ -1,0 +1,7 @@
+*.prof
+*.summary
+test-summary*
+*.hp
+*.aux
+*.ps
+Swedish
