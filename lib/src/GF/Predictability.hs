@@ -11,7 +11,7 @@ import Control.Monad (when)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
 import Data.Map (Map)
-import Data.List (intercalate)
+import Data.List (intercalate, foldl')
 import Data.String.Utils (split)
 import Data.Maybe (isJust, fromJust)
 import GF.Predictability.GFScript
@@ -328,18 +328,25 @@ emptySummary = Summary Map.empty 0 Map.empty 0
 mkSummary :: FilePath -> IO Summary
 mkSummary path = do
   content <- readFile path
-  return $ foldl aggregate emptySummary (map read $ lines content)
+  return $ foldl' aggregate emptySummary (map read $ lines content)
   where aggregate :: Summary -> Result -> Summary
-        aggregate s r =   case r of
-          (w, Right l) -> s { getResultDist =
-                                 Map.alter incr (length l) (getResultDist s)
-                            , getTotal = 1 + (getTotal s)}
-          (w, Left e) -> s { getSkippedDist =
-                                Map.alter incr e (getSkippedDist s)
-                           , getTotal = 1 + (getTotal s)}
+        aggregate !s r =   case r of
+          (w, Right l) ->
+            let newResultDist = incr_map (getResultDist s) (length l)
+                newTotal = 1 + (getTotal s)
+            in newResultDist `seq` newTotal `seq` s { getResultDist = newResultDist, getTotal = newTotal }
+          (w, Left e) ->
+            let newSkippedDist = incr_map (getSkippedDist s) e
+                newTotal = 1 + (getTotal s)
+            in newSkippedDist `seq` newTotal `seq` s { getSkippedDist = newSkippedDist, getTotal = newTotal}
         incr :: Maybe Int -> Maybe Int
         incr Nothing = Just 1
-        incr (Just n) = Just (n + 1)
+        incr (Just !n) = Just (n + 1)
+        incr_map :: (Ord k) => Map k Int -> k -> Map k Int
+        incr_map m k =
+          case Map.lookup k m of
+            Nothing -> Map.insert k 1 m
+            Just n -> let n' = n + 1 in n' `seq` Map.insert k n' m
 
 predictability :: Summary -> Double
 predictability s = 
