@@ -1,6 +1,18 @@
+# Emacs files
 *~
 #*#
+
+# GF files
 *.gfo
+
+# GHC files
 dist/
 *.hi
 *.o
+
+# Profiling files
+*.prof
+*.summary
+*.hp
+*.aux
+*.ps
