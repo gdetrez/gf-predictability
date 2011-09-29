@@ -1,5 +1,5 @@
 PROG = Swedish
-DATA = nouns.csv
+DATA = nouns.csv adjectives.csv
 BUILDDIR = build
 
 ifdef PROFILE
