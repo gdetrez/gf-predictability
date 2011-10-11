@@ -1,0 +1,21 @@
+* Verbs
+Log file: verbs-Verbs.log
+
+  +--------+--------+
+  | #forms | #words |
+  +--------+--------+
+  |      1 |   6333 |
+  |     51 |    542 |
+  +--------+--------+
+
+Total: 6875
+
+Predictability: 4.941818181818181
+
+Skipped: 1915
+Reasons:
+	Missing form (1915)
+
+Total (incl. skipped): 8790
+
+Experiment: French Verbs
