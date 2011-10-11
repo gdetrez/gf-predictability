@@ -1,39 +1,31 @@
-#PROG = Swedish
-#DATA = nouns.csv
-BUILDDIR = build
-
-ifdef PROFILE
-PROF_FLAGS = +RTS -p -${PROFILE} -i0.001 -s${PROG}.summary -RTS
-else
-PROF_FLAGS = 
-endif
-
-all: run
-
-run: LOGFILE = "summary-`date +'%Y-%m-%d:%H:%M'`"
-run: ${DATA} ${PROG}
-	./${PROG} --summary ${LOGFILE} ${PROF_FLAGS}
-
-test: LOGFILE = "test-summary-`date +'%Y-%m-%d:%H:%m'`"
-test: ${DATA} ${PROG}
-	./${PROG} --test --summary ${LOGFILE} ${PROF_FLAGS}
+DATE=`date +'%Y%m%d%H%M'`
+DATA = verbs.csv nouns.csv adjectives.csv
 
 .SECONDARY: ${DATA}
 
-profiling: ${PROG}
-	time ./${PROG} +RTS -p -hc -i 0.001 -s${PROG}.summary
+all: verbs.summary nouns.summary adjectives.summary
 
-${PROG}: ${PROG}.hs | ${BUILDDIR}
-	ghc --make -prof -caf-all -auto-all \
-	    -hidir ${BUILDDIR}\
-	    -odir ${BUILDDIR}\
-	    -fforce-recomp\
-	    -i../lib/src $<
+test: verbs-test.summary nouns-test.summary adjectives-test.summary
 
-${BUILDDIR}:
-	mkdir ${BUILDDIR}
+%.summary: %.hs %.csv
+	time runghc -i../lib/src/ $*.hs\
+	     --lexicon=$*.csv\
+	     --summary=$@\
+	     --results=$*.results
+
+%-test.csv: %.csv
+	head -n100 $< > $@
+
+%-test.summary: %.hs %-test.csv
+	time runghc -i../lib/src/ $*.hs\
+	     --lexicon=$*-test.csv\
+	     --summary=$@\
+	     --results=$*-test.results
+
+run-%: %.csv
+	time runghc ${FLAGS} $*.hs
 
 clean:
-	-rm -rf ${BUILDDIR}
-	-rm ${PROG}
-	-rm $(addprefix ${PROG}, .hp .log .prof .ps .aux .summary)
+	-rm *.csv
+	-rm *.summary
+	-rm *.results

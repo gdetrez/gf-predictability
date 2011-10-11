@@ -16,3 +16,10 @@ dist/
 *.hp
 *.aux
 *.ps
+
+# Experiment files
+*.summary
+*.results
+
+* Other
+*.old
