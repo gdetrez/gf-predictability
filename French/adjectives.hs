@@ -5,7 +5,7 @@ import GF.Predictability.Utils
 
 -- ********************************* ADJECTIVES ******************************
 testAdj :: TestFunction
-testAdj l1 l2 = and $ zipWith (==) l1 l2
+testAdj = take 4
 
 setupAdj :: SetupFunction
 setupAdj fs@[beau,beaux,belle,belles] | "" `elem` fs = skip $ "Missing form"

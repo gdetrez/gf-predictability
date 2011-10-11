@@ -31,10 +31,12 @@ data Experiment =
 -- skipping.
 type SetupFunction = [String] -> Either String [[String]]
 
--- | The test function takes two lists of strings (first the output from GF
--- and then the entry from the lexicon) and copare them, returning True if
--- the GF guessed right.
-type TestFunction = [String] -> [String] -> Bool
+-- | The test function is not doing the test, instead it takes the output from GF
+-- (as a list of strings) and should massage it to make it comparable to the lexicon forms
+-- (for example, comparable by (==))
+-- 
+-- This is useful because it often happens that gf returns more than forms the lexicon
+type TestFunction = [String] -> [String]
 
 -- | A lexicon is a list of lexicon entries. A lexicon entry is given by
 -- an identifier to represent the entry (can be any sort of string like "œeuil_N") and the

@@ -6,16 +6,16 @@ import GF.Predictability.Utils
 
 -- *********************************** VERBS *********************************
 testVerb :: TestFunction
-testVerb = (==) . prune
-  where prune [ går,gås,gick,gicks,
-                gå_imp,_,gå_inf,gås_inf,gått,gåtts,
-                gången,gångens,gånget,gångets,
-                gångna_undef,gångnas_undef,gångna_def,gångnas_def, 
-                _,_,_,_ ] = [ går,gås,gick,gicks,
-                        gå_imp,gå_inf,gås_inf,gått,gåtts,
-                        gången,gångens,gånget,gångets,
-                        gångna_undef,gångnas_undef,gångna_def,gångnas_def ]
-        prune _ = []
+testVerb [ går,gås,gick,gicks,
+           gå_imp,_,gå_inf,gås_inf,gått,gåtts,
+           gången,gångens,gånget,gångets,
+           gångna_undef,gångnas_undef,gångna_def,gångnas_def, 
+           _,_,_,_ ] = [ går,gås,gick,gicks,
+                         gå_imp,gå_inf,gås_inf,gått,gåtts,
+                         gången,gångens,gånget,gångets,
+                         gångna_undef,gångnas_undef,gångna_def,gångnas_def ]
+testVerb _ = []
+
 setupVerb :: SetupFunction
 setupVerb fs | "" `elem` fs = skip $ "Missing form"
 setupVerb [ går,gås,gick,gicks,

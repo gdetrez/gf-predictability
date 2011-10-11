@@ -23,7 +23,7 @@ import System.Log.Logger
 import System.Log.Handler.Simple
 import Text.Printf
 import qualified Data.Map as Map
-
+import qualified System.Console.ANSI as ANSI
 import GF.Predictability.GFScript
 import GF.Predictability.Data
 import GF.Predictability.Utils
@@ -34,12 +34,12 @@ import Test.Framework hiding (runTest, Result)
 
 -- *************************** EXPOSED FUNCTIONS ****************************
 -- | Build an basic experiment. This one uses default function for setup and
--- test. (Resp.: (return . tail . inits) and (==))
+-- test. (Resp.: (return . tail . inits) and id)
 mkExperiment :: String     -- ^ Experiment name
              -> String     -- ^ .gfo file
              -> String     -- ^ oper name
              -> Experiment
-mkExperiment n g o = Experiment n g o (return . tail . inits) (==)
+mkExperiment n g o = Experiment n g o (return . tail . inits) id
 
 -- | Build an experiment given the same parameters than mkExperiment and two
 -- functions in addition: setup function that take a lexicon entry and return
@@ -94,6 +94,7 @@ data Options = Options
   , getResultFile :: Maybe String
   , summaryFile :: Maybe String
   , debugLevel :: Priority
+  , getShowDiff :: Bool
   }
 -- Options declaration
 optDescr :: [OptDescr (Options -> Options)]
@@ -108,6 +109,8 @@ optDescr =
     "enable debug messages"
   , Option ['q'] ["quiet"] (NoArg (\o -> o {debugLevel=ERROR}))
     "Disable most output"
+  , Option ['d'] ["diff"] (NoArg (\o -> o {getShowDiff=True}))
+    "Display a simple difference list between GF's output and the lexicon entry"
   ]
 
 getOptions :: IO Options
@@ -117,7 +120,7 @@ getOptions = do
   case msg of
     [] -> return $ foldl (.) id optFuns defaultOptions
     msgs -> fail $ unlines msgs
-  where defaultOptions = Options Nothing Nothing Nothing NOTICE
+  where defaultOptions = Options Nothing Nothing Nothing NOTICE False
 -- **************************************************************************
 
 -- *************************** INTERNAL FUNCTIONS ***************************
@@ -162,13 +165,28 @@ runTest (entry,forms) = do
           oper <- getParam envOper
           gf_out <- lift $ cc gfo oper s
           test <- getParam envTest
-          case test gf_out forms of
+          case (test gf_out) == forms of
             True -> do
               debug "✔ OK \n"
               putResult (entry, return s)
             False -> do
               debug "✖ NO \n"
+              debug $ printDiff (test gf_out) forms
               run ss
+
+-- Terminal colors
+red :: String -> String
+red s = 
+  (ANSI.setSGRCode $ [ANSI.SetColor ANSI.Foreground ANSI.Vivid ANSI.Red])
+  ++ s ++
+  (ANSI.setSGRCode [])
+
+printDiff :: [String] -> [String] -> String
+printDiff l1 l2 = unlines $ zipWith printDiff' l1 l2
+            where printDiff' a b | a == b = 
+                    printf "%-30s %-30s" a b
+                  printDiff' a b = 
+                    printf "*%-37s %-30s" (red a) b
 
 -- | Create and run a GF script that execute the experiment's 'oper'
 -- on the given list of arguments using the cc command from the gf shell.

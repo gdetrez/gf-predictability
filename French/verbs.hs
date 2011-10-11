@@ -5,7 +5,7 @@ import GF.Predictability.Utils
 
 -- ********************************** VERBS **********************************
 testVerb :: TestFunction
-testVerb l1 l2 = and $ zipWith (==) l1 (head l2:l2)
+testVerb l= take 51 $ drop 1 l
 
 setupVerb :: SetupFunction
 setupVerb vForms | [] `elem` vForms = skip $ "Missing form"

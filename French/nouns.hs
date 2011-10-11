@@ -5,7 +5,7 @@ import GF.Predictability.Utils
 
 -- ************************************ NOUNS ********************************
 testNoun :: TestFunction
-testNoun = (==)
+testNoun = id
 
 setupNoun :: SetupFunction
 setupNoun ("":_) = skip $ "No singular form"
