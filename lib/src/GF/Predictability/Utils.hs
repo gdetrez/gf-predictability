@@ -1,16 +1,17 @@
 module GF.Predictability.Utils (
   readCSVLexicon,
-  esc
+  esc,
+  mkFileName
   ) where
 
-import GF.Predictability
+import GF.Predictability.Data
+import Data.Char (toLower)
 
 -- | Read a csv lexicon where lines have the following form:
 -- lemme, form1, form2, form3...
-readCSVLexicon :: FilePath -> IO Lexicon
-readCSVLexicon path = do
-  content <- readFile path
-  return $ map (\x -> (head x, tail x)) $ map split $ lines content
+readCSVLexicon :: String -> Lexicon
+readCSVLexicon content =
+  map (\x -> (head x, tail x)) $ map split $ lines content
   where split :: String -> [String]
         split = split' []
         split' p [] = [reverse p]
@@ -20,3 +21,11 @@ readCSVLexicon path = do
 -- | escape a string with double quotes
 esc :: String -> String
 esc s = "\"" ++ s ++ "\""
+
+-- | Create a non problematic file name by stripping all non ascii characters
+mkFileName :: String -> String
+mkFileName = map char
+  where char c | c `elem` ['a'..'z'] = c
+        char c | c `elem` ['A'..'Z'] = toLower c
+        char ' ' = '_'
+        char _ = '+'
