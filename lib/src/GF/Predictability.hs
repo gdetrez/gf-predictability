@@ -4,14 +4,14 @@
 module GF.Predictability (
   Experiment, Lexicon, TestFunction, SetupFunction,
   mkExperiment, mkExperimentWithFunctions, skip,
-  mainRunExperiment, mainRunExperiments
+  mainRunExperiment
   ) where
 
 import Control.Monad (when)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
 import Data.Map (Map)
-import Data.List (intercalate, foldl')
+import Data.List (intercalate, foldl', inits)
 import Data.String.Utils (split)
 import Data.Maybe (isJust, fromJust)
 import System (getArgs)
@@ -28,8 +28,8 @@ import GF.Predictability.GFScript
 import GF.Predictability.Data
 import GF.Predictability.Utils
 -- * TESTING *
---import Test.Framework hiding (runTest, Result)
---import Data.List (inits)
+import Test.Framework hiding (runTest, Result)
+--
 -- **
 
 -- *************************** EXPOSED FUNCTIONS ****************************
