@@ -6,7 +6,7 @@ import GF.Predictability.Utils
 
 -- ******************************* ADJECTIVES *******************************
 testAdjective :: TestFunction
-testAdjective = (==) . take 16
+testAdjective gf lex = zip (take 16 gf) lex
 
 setupAdjective :: SetupFunction
 setupAdjective fs | "" `elem` fs = skip $ "Missing form"

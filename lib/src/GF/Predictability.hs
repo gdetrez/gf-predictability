@@ -34,12 +34,12 @@ import Test.Framework hiding (runTest, Result)
 
 -- *************************** EXPOSED FUNCTIONS ****************************
 -- | Build an basic experiment. This one uses default function for setup and
--- test. (Resp.: (return . tail . inits) and id)
+-- test. (Resp.: (return . tail . inits) and zip)
 mkExperiment :: String     -- ^ Experiment name
              -> String     -- ^ .gfo file
              -> String     -- ^ oper name
              -> Experiment
-mkExperiment n g o = Experiment n g o (return . tail . inits) id
+mkExperiment n g o = Experiment n g o (return . tail . inits) zip
 
 -- | Build an experiment given the same parameters than mkExperiment and two
 -- functions in addition: setup function that take a lexicon entry and return
@@ -165,13 +165,13 @@ runTest (entry,forms) = do
           oper <- getParam envOper
           gf_out <- lift $ cc gfo oper s
           test <- getParam envTest
-          case (test gf_out) == forms of
+          case and $ map (\(a,b) -> a == b) (test gf_out forms) of
             True -> do
               debug "✔ OK \n"
               putResult (entry, return s)
             False -> do
               debug "✖ NO \n"
-              debug $ printDiff (test gf_out) forms
+              debug $ printDiff (test gf_out forms)
               run ss
 
 -- Terminal colors
@@ -181,11 +181,11 @@ red s =
   ++ s ++
   (ANSI.setSGRCode [])
 
-printDiff :: [String] -> [String] -> String
-printDiff l1 l2 = unlines $ zipWith printDiff' l1 l2
-            where printDiff' a b | a == b = 
+printDiff :: [(String,String)] -> String
+printDiff l = unlines $ map printDiff' l
+            where printDiff' (a, b) | a == b = 
                     printf "%-30s %-30s" a b
-                  printDiff' a b = 
+                  printDiff' (a, b) = 
                     printf "*%-37s %-30s" (red a) b
 
 -- | Create and run a GF script that execute the experiment's 'oper'

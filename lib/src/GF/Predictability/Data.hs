@@ -31,12 +31,15 @@ data Experiment =
 -- skipping.
 type SetupFunction = [String] -> Either String [[String]]
 
--- | The test function is not doing the test, instead it takes the output from GF
--- (as a list of strings) and should massage it to make it comparable to the lexicon forms
--- (for example, comparable by (==))
+-- | The test function is not doing the test, instead it takes the output
+-- from GF and the forms from the lexicon and (as a lista of strings)
+-- and should massage them to make them comparable. It returns a list of
+-- String tuples that will be compared together.
+-- (for example, with (==))
 -- 
--- This is useful because it often happens that gf returns more than forms the lexicon
-type TestFunction = [String] -> [String]
+-- This is useful because it often happens that gf returns more forms than 
+-- the lexicon
+type TestFunction = [String] -> [String] -> [(String,String)]
 
 -- | A lexicon is a list of lexicon entries. A lexicon entry is given by
 -- an identifier to represent the entry (can be any sort of string like "œeuil_N") and the

@@ -10,11 +10,12 @@ testVerb [ går,gås,gick,gicks,
            gå_imp,_,gå_inf,gås_inf,gått,gåtts,
            gången,gångens,gånget,gångets,
            gångna_undef,gångnas_undef,gångna_def,gångnas_def, 
-           _,_,_,_ ] = [ går,gås,gick,gicks,
-                         gå_imp,gå_inf,gås_inf,gått,gåtts,
-                         gången,gångens,gånget,gångets,
-                         gångna_undef,gångnas_undef,gångna_def,gångnas_def ]
-testVerb _ = []
+           _,_,_,_ ] lex =
+  zip [ går,gås,gick,gicks,
+        gå_imp,gå_inf,gås_inf,gått,gåtts,
+        gången,gångens,gånget,gångets,
+        gångna_undef,gångnas_undef,gångna_def,gångnas_def ] lex
+testVerb _ _ = undefined
 
 setupVerb :: SetupFunction
 setupVerb fs | "" `elem` fs = skip $ "Missing form"

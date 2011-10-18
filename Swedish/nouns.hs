@@ -6,7 +6,7 @@ import GF.Predictability.Utils
 
 -- ************************************ NOUNS *******************************
 testNoun :: TestFunction
-testNoun = take 8
+testNoun gf lex = zip (take 8 gf) lex
 
 setupNoun :: SetupFunction
 setupNoun fs | "" `elem` fs = skip $ "Missing form"
