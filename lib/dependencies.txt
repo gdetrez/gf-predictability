@@ -1,0 +1,4 @@
+cabal packages:
+- ansi-terminal
+- hslogger
+- missingh
