@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE BangPatterns #-}
-{-# OPTIONS_GHC -F -pgmF htfpp #-}
+{-- # OPTIONS_GHC -F -pgmF htfpp #-}
 module GF.Predictability (
   Experiment, Lexicon, TestFunction, SetupFunction,
   mkExperiment, mkExperimentWithFunctions, skip,
@@ -28,8 +28,7 @@ import GF.Predictability.GFScript
 import GF.Predictability.Data
 import GF.Predictability.Utils
 -- * TESTING *
-import Test.Framework hiding (runTest, Result)
---
+-- import Test.Framework hiding (runTest, Result)
 -- **
 
 -- *************************** EXPOSED FUNCTIONS ****************************
