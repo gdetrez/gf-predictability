@@ -1,0 +1,21 @@
+Producing the lexica:
+
+  % cd GF/lib/src/
+  % gf
+  > i finnish/DictFin.gf
+  > gt -cat=VK | l -list | wf -file=verbsFin.txt
+  > gt -cat=NK | l -list | wf -file=nounsFin.txt
+  > gt -cat=AK | l -list | wf -file=adjectivesFin.txt
+
+
+Lexicon sizes:
+
+  % wc *.txt
+    1467   14670  193296 adjectivesFin.txt
+   25414  254660 3322151 nounsFin.txt
+    9498  113976 1389272 verbsFin.txt
+   36379  383306 4904719 total
+
+  % runghc MkExLex <verbsFin.txt >verbs.txt
+
+
