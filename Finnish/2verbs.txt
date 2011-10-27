@@ -1,3 +1,0 @@
-aakkostaa_V,aakkostaa,aakkostan,aakkostaa,aakkostavat,aakkostakaa,aakkostetaan,aakkostin,aakkosti,aakkostaisi,aakkostanut,aakkostettu,aakkostanee
-aallota_V,aallota,aaltoan,aaltoaa,aaltoavat,aallotkaa,aallotaan,aaltosin,aaltosi,aaltoaisi,aallonnut,aallottu,aallonnee
-aallottaa_V,aallottaa,aallotan,aallottaa,aallottavat,aallottakaa,aallotetaan,aallotin,aallotti,aallottaisi,aallottanut,aallotettu,aallottanee

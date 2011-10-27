@@ -1,0 +1,19 @@
+A little experiment with constructors and wc:
+
+
+               constrs   -l    -w    -c
+ParadigmsEng   3891     721  4365 21234
+ParadigmsSwe   3908     662  4077 20770
+ParadigmsFre   2817     470  2934 15025 
+ParadigmsFin   4612     643  4571 23048
+
+-> constrs = bytes/5 appr.
+
+
+code size as constructors
+
+      mkN   mkV  total_N+V
+Eng   403   837   991
+Swe   918  1039  1884
+Fre   351  2193  2541
+Fin  4772  3343  6885
