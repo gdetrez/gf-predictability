@@ -5,10 +5,11 @@ import GF.Predictability.Utils
 import Debug.Trace
 -- ********************************** VERBS **********************************
 test :: TestFunction
+test [man, _, men, _, _] [man',"-"] = [(man, man')]
 test [man, _, men, _, _] l2 = zip [man, men] l2
 
 setup :: SetupFunction
-setup vForms | [] `elem` vForms = skip $ "Missing form"
+setup vForms | "-" `elem` vForms = skip $ "Missing form"
 setup [man, men] = 
   return $ map (map esc )
     [ [ man ]

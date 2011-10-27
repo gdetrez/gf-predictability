@@ -8,7 +8,7 @@ testVerb :: TestFunction
 testVerb l1 l2 = zip l1 l2
 
 setupVerb :: SetupFunction
-setupVerb vForms | [] `elem` vForms = skip $ "Missing form"
+setupVerb vForms | "-" `elem` vForms = skip $ "Missing form"
 setupVerb [blow,blows,blown,blowing,blew] = 
   return $ map (map esc )
     [ [ blow ]
