@@ -12,6 +12,9 @@ parser.add_option( "--nouns", const="N",
 parser.add_option("--verbs", const="V",
                   action="store_const", dest="PoS", default=None,
                   help="Extract verbs")
+parser.add_option("--adjectives", const="A",
+                  action="store_const", dest="PoS", default=None,
+                  help="Extract verbs")
 (options, args) = parser.parse_args()
 
 def list2dict(l):
@@ -47,5 +50,11 @@ if __name__ == "__main__":
                 try:
                     writer.writerow([d["VB"] + "_V", d["VB"], d["VBZ"],
                                      d["VBN"], d["VBG"], d["VBD"]])
+                except KeyError:
+                    print >> sys.stderr, "Error in line: %s" % line.strip()
+            if options.PoS == 'A' and d.has_key("JJ"):
+                try:
+                    writer.writerow([d["JJ"] + "_A", d["JJ"], d["JJR"],
+                                     d["JJS"]])
                 except KeyError:
                     print >> sys.stderr, "Error in line: %s" % line.strip()

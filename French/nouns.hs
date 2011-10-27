@@ -5,7 +5,7 @@ import GF.Predictability.Utils
 
 -- ************************************ NOUNS ********************************
 testNoun :: TestFunction
-testNoun = id
+testNoun = zip
 
 setupNoun :: SetupFunction
 setupNoun ("":_) = skip $ "No singular form"

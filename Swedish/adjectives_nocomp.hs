@@ -24,7 +24,7 @@ setupAdjective o = skip $ "Invalid lexicon entry"
 main :: IO ()
 main = do
   let adjectiveEx = mkExperimentWithFunctions 
-               "Adjectives"
+               "Adjectives (Whithour comparatives and superlatives)"
                "alltenses/ParadigmsSwe.gfo"
                "mkA"
                setupAdjective

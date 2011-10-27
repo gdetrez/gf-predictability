@@ -14,9 +14,10 @@ quite a lot of time.
 - ansi-terminal
 - hslogger
 - missingh
+- transformers
 
 Those  can be installed using cabal with the following command:
-> cabal install ansi-terminal hslogger missingh
+> cabal install ansi-terminal hslogger missingh transformers
 
 Some of the experiment also use python or xsltproc to prepare the
 lexicon and all use gnu make.
@@ -49,13 +50,14 @@ and the rest is the full inflection table considered in the
 experiment.
 
 Example, the english verbs lexicon looks like:
-: hoover_V,hoover,hoovers,hoovered,hoovering,hoovered
-: latinize_V,latinize,latinizes,latinized,latinizing,latinized
-: roneo_V,roneo,roneos,roneoed,roneoing,roneoed
-: xerox_V,xerox,xeroxes,xeroxed,xeroxing,xeroxed
-: abandon_V,abandon,abandons,abandoned,abandoning,abandoned
-: abase_V,abase,abases,abased,abasing,abased
-: abash_V,abash,abashes,abashed,abashing,abashed
+
+hoover_V,hoover,hoovers,hoovered,hoovering,hoovered
+latinize_V,latinize,latinizes,latinized,latinizing,latinized
+roneo_V,roneo,roneos,roneoed,roneoing,roneoed
+xerox_V,xerox,xeroxes,xeroxed,xeroxing,xeroxed
+abandon_V,abandon,abandons,abandoned,abandoning,abandoned
+abase_V,abase,abases,abased,abasing,abased
+abash_V,abash,abashes,abashed,abashing,abashed
 
 Defining the experiment
 .......................
