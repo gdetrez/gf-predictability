@@ -5,21 +5,26 @@ import GF.Predictability.Utils
 import Debug.Trace
 -- ********************************** VERBS **********************************
 test :: TestFunction
-test [man, _, men, _, _] l2 = zip [man, men] l2
+test l1 l2 = zip l1 l2
 
 setup :: SetupFunction
 setup vForms | [] `elem` vForms = skip $ "Missing form"
-setup [man, men] = 
+setup [talo,talon,taloa,talona,taloon,talojen,taloja,taloina,taloissa,taloihin] = 
   return $ map (map esc )
-    [ [ man ]
-    , [ man, men ]
+    [ [ talo ]
+    , [ talo, taloja ]
+    , [ talo, talon, taloja ]
+    , [ talo, talon, taloja, taloa ]
+    , [ talo,talon,taloa,talona,taloon,talojen,taloja,taloina,taloissa,taloihin ]
+
     ]
+setup _ = skip $ "Missing form"
  
 main = do
   let ex = mkExperimentWithFunctions 
-           "English nouns" 
-           "alltenses/ParadigmsEng.gfo"
-           "mkN"
+           "Finnish nouns" 
+           "alltenses/ShortParadigmsFin.gfo"
+           "mkNForms"
            setup
            test
   
