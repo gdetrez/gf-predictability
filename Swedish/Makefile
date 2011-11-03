@@ -1,4 +1,4 @@
-EXPERIMENTS = nouns verbs adjectives adjectives_nocomp verbs_inf
+EXPERIMENTS = nouns adjectives adjectives_nocomp verbs verbs_inf
 include ../common.mk
 
 %.csv: saldom-%.xsl saldom.xml
