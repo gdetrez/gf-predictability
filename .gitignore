@@ -23,3 +23,5 @@ dist/
 
 * Other
 *.old
+.shelly/
+cabal-dev/
