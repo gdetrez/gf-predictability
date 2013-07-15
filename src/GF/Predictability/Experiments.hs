@@ -51,6 +51,7 @@ runExperiment opts e = shelly $ silently $ do
     gf <- findGf (gfBin opts)
     notice $ "Using gf binary: " ++ show gf
     lexicon <- getLexicon gf (lexicon e) (category e)
+    notice $ show (length lexicon) ++ " entries found"
     costs <- mapM (wordCost gf e) lexicon
     return $ makeReport e costs
 
