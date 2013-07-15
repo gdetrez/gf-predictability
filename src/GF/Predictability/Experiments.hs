@@ -2,10 +2,10 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE ImplicitParams #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
-module Experiments where
+module GF.Predictability.Experiments where
 
-import Stats
-import Types
+import GF.Predictability.Stats
+import GF.Predictability.Types
 import Debug.Trace
 import qualified Data.Text.Lazy as LT
 import Data.List (isPrefixOf)
@@ -20,22 +20,23 @@ data Experiment = Experiment
   , category      :: String
   , morphology    :: FilePath
   , smartparadigm :: Oper
-  , setup         :: Word -> [[Text]]
-  }
+  , setup         :: Word -> [[Text]] }
 
 type ExperimentResult = [(String, Int)]
 data ExperimentReport = ExperimentReport
-  { entries      :: Int
+  { experiment   :: String
+  , entries      :: Int
   , meanCost     :: Double
   , medianCost   :: Double
   , m1           :: Int
   , m2           :: Int
   , distribution :: [Int] }
-  deriving (Eq,Show)
+  deriving (Eq, Show)
 
-makeReport :: [Int] -> ExperimentReport
-makeReport costs = ExperimentReport
-  { entries      = length costs
+makeReport :: Experiment -> [Int] -> ExperimentReport
+makeReport e costs = ExperimentReport
+  { experiment   = title e
+  , entries      = length costs
   , meanCost     = mean fcosts
   , medianCost   = median fcosts
   , m1           = count 1
@@ -51,7 +52,7 @@ runExperiment opts e = shelly $ silently $ do
     notice $ "Using gf binary: " ++ show gf
     lexicon <- getLexicon gf (lexicon e) (category e)
     costs <- mapM (wordCost gf e) lexicon
-    return $ makeReport costs
+    return $ makeReport e costs
 
 
 -- | Function that tries to find the gf binaries given the --gf-bin option
@@ -99,7 +100,7 @@ esc t = LT.concat ["\"", t, "\""]
 
 -- | Extract a lexicon from the given gfo file for the given category
 getLexicon :: FilePath -> FilePath -> String -> Sh Lexicon
-getLexicon gf file cat = do
+getLexicon gf file cat = silently $ do
     setStdin $ LT.pack ("gt -cat=" ++ cat ++ " | l -list")
     output <- cmd gf "-run" file "+RTS" "-K32M" "-RTS"
     return $ filter (not.null) (map readLine (LT.lines output))
@@ -110,7 +111,7 @@ getLexicon gf file cat = do
 -- loaded using --retain and execute the given gf function using the 
 -- compute_concrete command
 computeConcrete :: FilePath -> FilePath -> LT.Text -> [LT.Text] -> Sh Word
-computeConcrete gf gfo oper args = do
+computeConcrete gf gfo oper args = silently $ do
     setStdin gfcommand
     output <- cmd gf "--run" "--retain" gfo
     return (LT.lines output)

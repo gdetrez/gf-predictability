@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module ExperimentsSpec where
+module GF.Predictability.ExperimentsSpec where
 
 import Test.Hspec
 import Test.QuickCheck
@@ -8,50 +8,52 @@ import GF.Predictability.Options
 import Control.Monad (liftM)
 import Data.List (sort)
 
-import Experiments -- SUT
+import GF.Predictability.Experiments -- SUT
 
 spec :: Spec
 spec = do
   describe "makeReport" $ do
+    let dummyExp = undefined :: Experiment
+
     it "counts the number of entries" $
-      forAll arbitrary $ \is -> entries (makeReport is) `shouldBe` length is
+      forAll arbitrary $ \is -> entries (makeReport dummyExp is) `shouldBe` length is
 
     let exampleCosts = [1,2,3,4,5,1,2,3,4,1,2,3,1,2,1]
 
     it "compute the mean cost" $
-      meanCost (makeReport exampleCosts) `shouldBe` 2.3333333333333335
+      meanCost (makeReport dummyExp exampleCosts) `shouldBe` 2.3333333333333335
 
     it "compute the median" $
-      medianCost (makeReport exampleCosts) `shouldBe` 2
+      medianCost (makeReport dummyExp exampleCosts) `shouldBe` 2
 
     it "compute the number of ones" $ 
-      m1 (makeReport exampleCosts) `shouldBe` 5
+      m1 (makeReport dummyExp exampleCosts) `shouldBe` 5
 
     it "compute the number of elements with a cost of 1 or 2" $
-      m2 (makeReport exampleCosts) `shouldBe` 9
+      m2 (makeReport dummyExp exampleCosts) `shouldBe` 9
 
     it "returns a break down of the costs distribution" $
-      distribution (makeReport exampleCosts) `shouldBe` [5,4,3,2,1]
+      distribution (makeReport dummyExp exampleCosts) `shouldBe` [5,4,3,2,1]
 
     it "has a mean between bellow the maximum" $ property $
       forAll getCosts $ \xs ->
-        meanCost (makeReport xs) `shouldSatisfy` (<= fromIntegral (maximum xs))
+        meanCost (makeReport dummyExp xs) `shouldSatisfy` (<= fromIntegral (maximum xs))
 
     it "m1 is <= that the list size" $ property $
       forAll getCosts $ \xs ->
-        m1 (makeReport xs) `shouldSatisfy` (<= length xs)
+        m1 (makeReport dummyExp xs) `shouldSatisfy` (<= length xs)
 
     it "m2 is <= that the list size" $ property $
       forAll getCosts $ \xs ->
-        m2 (makeReport xs) `shouldSatisfy` (<= length xs)
+        m2 (makeReport dummyExp xs) `shouldSatisfy` (<= length xs)
 
     it "m1 <= m2" $
       forAll getCosts $ \xs ->
-        m1 (makeReport xs) <= m2 (makeReport xs) `shouldBe` True
+        m1 (makeReport dummyExp xs) <= m2 (makeReport dummyExp xs) `shouldBe` True
 
     it "the distribution sums to the length of the list" $
       forAll getCosts $ \xs ->
-        sum (distribution (makeReport xs)) `shouldBe` length xs
+        sum (distribution (makeReport dummyExp xs)) `shouldBe` length xs
 
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do
@@ -99,7 +101,8 @@ spec = do
           shelly (wordCost "gf" experiment ["mouse", "mices"]) `shouldReturn` 2
     describe "runExperiment" $ do
       let report = ExperimentReport
-                        { entries      = 3
+                        { experiment   = "English nouns"
+                        , entries      = 3
                         , meanCost     = 1.3333333333333333
                         , medianCost   = 1
                         , m1           = 2
@@ -127,7 +130,8 @@ spec = do
         it "eat has cost 3" $
           shelly (wordCost "gf" experiment ["eat","ate","eaten"]) `shouldReturn` 3
     describe "runExperiment" $ do
-      let report = ExperimentReport { entries      = 3
+      let report = ExperimentReport { experiment   = "English verbs"
+                                    , entries      = 3
                                     , meanCost     = 2
                                     , medianCost   = 2
                                     , m1           = 1

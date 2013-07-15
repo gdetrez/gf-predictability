@@ -1,4 +1,4 @@
-module Types (Word, Lexicon, Oper, Text) where
+module GF.Predictability.Types (Word, Lexicon, Oper, Text) where
 
 import Data.Text.Lazy (Text)
 

@@ -1,9 +1,9 @@
-module StatsSpec where
+module GF.Predictability.StatsSpec where
 
 import Test.Hspec
 import Test.QuickCheck
 
-import Stats -- SUT
+import GF.Predictability.Stats -- SUT
 
 spec :: Spec
 spec = do

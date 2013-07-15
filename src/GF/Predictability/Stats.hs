@@ -1,4 +1,4 @@
-module Stats where
+module GF.Predictability.Stats where
 
 import Data.List
 

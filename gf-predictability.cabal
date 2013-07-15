@@ -42,27 +42,33 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 
-executable gf-predictability
-  -- .hs or .lhs file containing the Main module.
-  main-is:           gf-predictability.hs
-
+library
+  exposed-modules:     GF.Predictability
   -- Modules included in this executable, other than Main.
   other-modules:
-    Experiments
+    GF.Predictability.Experiments
+    GF.Predictability.HtmlReport
+    GF.Predictability.Logging
+    GF.Predictability.Options
+    GF.Predictability.Stats
+    GF.Predictability.Types
+
 
   -- Other library packages from which modules are imported.
   build-depends:       base ==4.5.*, transformers ==0.3.*, containers ==0.4.*,
                        directory ==1.1.*, process ==1.1.*,
                        regex-compat ==0.95.*, shelly ==0.15.*, text,
-                       hslogger, optparse-applicative
+                       hslogger, optparse-applicative, blaze-html,
+                       hsparklines ==0.1.*
   hs-source-dirs:      src
 
 test-suite unit-tests
   type: exitcode-stdio-1.0
-  build-depends:       base ==4.5.*, transformers ==0.3.*, containers ==0.4.*,
+  build-depends:       hspec, QuickCheck == 2.6.*,
+                       base ==4.5.*, transformers ==0.3.*, containers ==0.4.*,
                        directory ==1.1.*, process ==1.1.*,
                        regex-compat ==0.95.*, shelly ==0.15.*, text,
-                       hslogger, optparse-applicative,
-                       hspec, QuickCheck == 2.6.*
+                       hslogger, optparse-applicative, blaze-html,
+                       hsparklines ==0.1.*
   main-is:             specs.hs
   hs-source-dirs:      src test
