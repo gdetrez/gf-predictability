@@ -55,7 +55,6 @@ runExperiment opts e = shelly $ silently $ do
 
 
 -- | Function that tries to find the gf binaries given the --gf-bin option
--- To do that, it should firts check if the given path exists relativel:b
 findGf :: Maybe FilePath -> Sh FilePath
 findGf (Nothing) = do
   gf <- which "gf"

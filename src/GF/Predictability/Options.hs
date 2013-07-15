@@ -18,8 +18,10 @@ defaultOptions = Options  { gfBin = Nothing, priority = NOTICE
                           , htmlReport = Nothing, plotReport = Nothing }
 
 parseVerbosity :: Parser Priority
-parseVerbosity = flag' INFO ( long "verbose" <> help "Enable verbose mode")
+parseVerbosity =
+            flag' INFO ( long "verbose" <> help "Enable verbose mode")
         <|> flag' DEBUG ( long "debug" <> help "Enable debug mode")
+        <|> flag' WARNING ( long "quiet" <> help "Print less information")
         <|> pure NOTICE
 
 parseOptions :: Parser Options
