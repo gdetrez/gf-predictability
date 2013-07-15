@@ -55,9 +55,9 @@ library
 
 
   -- Other library packages from which modules are imported.
-  build-depends:       base ==4.5.*, transformers ==0.3.*, containers ==0.4.*,
-                       directory ==1.1.*, process ==1.1.*,
-                       regex-compat ==0.95.*, shelly ==0.15.*, text,
+  build-depends:       base ==4.5.*, transformers, containers,
+                       directory, process,
+                       regex-compat, shelly, text,
                        hslogger, optparse-applicative, blaze-html,
                        hsparklines ==0.1.*
   hs-source-dirs:      src
@@ -65,9 +65,9 @@ library
 test-suite unit-tests
   type: exitcode-stdio-1.0
   build-depends:       hspec, QuickCheck == 2.6.*,
-                       base ==4.5.*, transformers ==0.3.*, containers ==0.4.*,
-                       directory ==1.1.*, process ==1.1.*,
-                       regex-compat ==0.95.*, shelly ==0.15.*, text,
+                       base, transformers, containers,
+                       directory, process,
+                       regex-compat, shelly, text,
                        hslogger, optparse-applicative, blaze-html,
                        hsparklines ==0.1.*
   main-is:             specs.hs
