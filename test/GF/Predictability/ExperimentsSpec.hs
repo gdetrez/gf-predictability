@@ -64,19 +64,19 @@ spec = do
 
     it "Should start with the title" $
       head (lines (ppReport report))
-        `shouldSatisfy` (isPrefixOf "English verbs")
+        `shouldSatisfy` isPrefixOf "English verbs"
     it "prints the mean cost" $
       ppReport report
-        `shouldSatisfy` (isInfixOf "mean cost: 2.0")
+        `shouldSatisfy` isInfixOf "mean cost: 2.0"
     it "prints the median cost" $
       ppReport report
-        `shouldSatisfy` (isInfixOf "median cost: 2.0")
+        `shouldSatisfy` isInfixOf "median cost: 2.0"
     it "prints the m=1 value" $
       ppReport report
-        `shouldSatisfy` (isInfixOf "m=1: 33% (1)")
+        `shouldSatisfy` isInfixOf "m=1: 33% (1)"
     it "prints the m<=2 value" $
       ppReport report
-        `shouldSatisfy` (isInfixOf "m<=2: 67% (2)")
+        `shouldSatisfy` isInfixOf "m<=2: 67% (2)"
 
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do

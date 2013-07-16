@@ -4,7 +4,7 @@ import Data.List
 
 -- |Numerically stable mean
 mean :: [Double] -> Double
-mean x = sum x / (fromIntegral (length x))
+mean x = sum x / fromIntegral (length x)
 
 -- |Median
 median :: [Double] -> Double

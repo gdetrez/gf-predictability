@@ -40,8 +40,8 @@ tableHeader = tr $ do
   th "entries"
   th "mean cost"
   th "median cost"
-  th ("m=1")
-  th ("m≤2 ")
+  th "m=1"
+  th "m≤2"
   th "distribution"
 
 

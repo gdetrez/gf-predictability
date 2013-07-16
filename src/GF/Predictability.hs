@@ -17,11 +17,11 @@ defaultMain experiments = do
     setLogger options
     shelly $ debug $ show options
     reports <- mapM (runExperiment options) experiments
-    case (htmlReport options) of
+    case htmlReport options of
       Just p -> shelly $ writefile p (makeHtmlReport reports)
       Nothing -> return ()
     shelly $ notice ""
-    shelly $ notice $ (take 36 (~~~)) ++ " Results " ++ (take 36 (~~~))
+    shelly $ notice $ take 36 (~~~) ++ " Results " ++ take 36 (~~~)
     mapM_ (shelly . notice . ppReport) reports
     shelly $ notice (take 79 (~~~))
   where (~~~) = repeat '~'

@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
-{-# LANGUAGE ImplicitParams #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 module GF.Predictability.Experiments where
 
@@ -70,7 +69,7 @@ runExperiment opts e = shelly $ silently $ do
     notice $ show (length lexicon) ++ " entries found"
     -- if the `--limit` option has been set, we cut the lexicon
     -- to the given value
-    let lexicon' = (maybe id take (limit opts)) lexicon
+    let lexicon' = maybe id take (limit opts) lexicon
     -- Compute the cost of all entries in the lexicon
     costs <- mapM (wordCost gf e) lexicon'
     -- Create and return an experiment report
@@ -87,7 +86,7 @@ findGf (Nothing) = do
 findGf (Just p) = do
   p' <- canonic p
   exists <- test_e p'
-  unless (exists) $ errorExit "The specified gf binary does not exists"
+  unless exists $ errorExit "The specified gf binary does not exists"
   return p'
 
 -- | This compute the cost of a single word
@@ -110,7 +109,7 @@ wordCost gf e w= do
     info $ "➭ Testing entry: " ++ show w
     outputs <- mapM (computeConcrete gf (morphology e) (smartparadigm e)) sequences
     let costs = map length sequences
-    let cost = case filter ((isPrefixOf w).snd) (zip costs outputs) of
+    let cost = case filter (isPrefixOf w . snd) (zip costs outputs) of
                 (c,_):_ -> c
                 [] -> length w
     info $ "  ↳ cost: " ++ show cost
@@ -122,7 +121,7 @@ esc t = T.concat ["\"", t, "\""]
 
 -- | Extract a lexicon from the given gfo file for the given category
 getLexicon :: FilePath -> FilePath -> String -> Int -> Sh Lexicon
-getLexicon gf file cat n = silently $ do
+getLexicon gf file cat n = do
     debug $ "gf> " ++ gfcmd
     setStdin $ T.pack gfcmd
     output <- cmd gf "-run" file "+RTS" "-K32M" "-RTS"

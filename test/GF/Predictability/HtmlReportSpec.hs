@@ -65,4 +65,4 @@ spec = do
 
 
 
-shouldContain html substr = (renderHtml html) `shouldSatisfy` (isInfixOf substr)
+shouldContain html substr = renderHtml html `shouldSatisfy` isInfixOf substr

@@ -15,7 +15,7 @@ data Options = Options
   , limit       :: Maybe Int
   } deriving (Eq,Show)
 
-defaultOptions = Options  { gfBin = Nothing, priority = NOTICE
+defaultOptions = Options  { gfBin = Nothing, priority = DEBUG
                           , htmlReport = Nothing, plotReport = Nothing
                           , limit = Nothing }
 
