@@ -13,6 +13,7 @@ import GF.Predictability.Logging
 import GF.Predictability.Options
 import Shelly
 import Prelude hiding (FilePath)
+import Text.Printf (printf)
 
 data Experiment = Experiment
   { title         :: String           -- ^ A title for the experiment
@@ -141,3 +142,13 @@ computeConcrete gf gfo oper args = silently $ do
     debug $ "gf: " ++ LT.unpack (LT.intercalate ", " (LT.lines output))
     return (LT.lines output)
   where gfcmd = LT.unwords ("cc":"-all":oper:args)
+
+-- | Pretty printing reports
+ppReport :: ExperimentReport -> String
+ppReport er = unlines
+  [ experiment er
+  , printf "  mean cost: %f" (meanCost er)
+  , printf "  median cost: %f" (medianCost er)
+  , printf "  m=1: %d%% (%d)" (m1Percent er) (m1 er)
+  , printf "  m<=2: %d%% (%d)" (m2Percent er) (m2 er)
+  ]

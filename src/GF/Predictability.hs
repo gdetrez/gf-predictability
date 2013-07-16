@@ -20,4 +20,8 @@ defaultMain experiments = do
     case (htmlReport options) of
       Just p -> shelly $ writefile p (makeHtmlReport reports)
       Nothing -> return ()
-    print reports
+    shelly $ notice ""
+    shelly $ notice $ (take 36 (~~~)) ++ " Results " ++ (take 36 (~~~))
+    mapM_ (shelly . notice . ppReport) reports
+    shelly $ notice (take 79 (~~~))
+  where (~~~) = repeat '~'

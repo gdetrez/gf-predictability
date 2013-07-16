@@ -6,7 +6,7 @@ import Test.QuickCheck
 import Shelly
 import GF.Predictability.Options
 import Control.Monad (liftM)
-import Data.List (sort)
+import Data.List (sort,isPrefixOf,isInfixOf)
 
 import GF.Predictability.Experiments -- SUT
 
@@ -54,6 +54,29 @@ spec = do
     it "the distribution sums to the length of the list" $
       forAll getCosts $ \xs ->
         sum (distribution (makeReport dummyExp xs)) `shouldBe` length xs
+
+  describe "ppReport" $ do
+    let report = ExperimentReport { experiment   = "English verbs"
+                                  , entries      = 3
+                                  , meanCost     = 2
+                                  , medianCost   = 2
+                                  , distribution = [1,1,1] }
+
+    it "Should start with the title" $
+      head (lines (ppReport report))
+        `shouldSatisfy` (isPrefixOf "English verbs")
+    it "prints the mean cost" $
+      ppReport report
+        `shouldSatisfy` (isInfixOf "mean cost: 2.0")
+    it "prints the median cost" $
+      ppReport report
+        `shouldSatisfy` (isInfixOf "median cost: 2.0")
+    it "prints the m=1 value" $
+      ppReport report
+        `shouldSatisfy` (isInfixOf "m=1: 33% (1)")
+    it "prints the m<=2 value" $
+      ppReport report
+        `shouldSatisfy` (isInfixOf "m<=2: 67% (2)")
 
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do
