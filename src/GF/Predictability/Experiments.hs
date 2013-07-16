@@ -57,8 +57,8 @@ m2Percent er = round (fromIntegral (m2 er) / fromIntegral (entries er) * 100)
 
 
 
-runExperiment :: Options -> Experiment -> IO ExperimentReport
-runExperiment opts e = shelly $ silently $ do
+runExperiment :: Options -> Experiment -> Sh ExperimentReport
+runExperiment opts e = do
     notice $ "*** " ++ title e ++ " ***"
     -- The first thing we do is to make sure we can find the gf binary.
     -- Otherwise we exit with an error

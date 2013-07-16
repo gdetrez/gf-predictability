@@ -81,31 +81,31 @@ spec = do
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do
       it "get the lexicon for the V category" $
-        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "V" 3)
+        liftM sort (shellyNoDir $ getLexicon "gf" "test/LexiconEng.gf" "V" 3)
           `shouldReturn` [["eat","ate","eaten"],["love","loved","loved"],["pray","prayed","prayed"]]
 
       it "gets the lexicon for the N category" $
-        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "N" 2)
+        liftM sort (shellyNoDir $ getLexicon "gf" "test/LexiconEng.gf" "N" 2)
           `shouldReturn` [["cat","cats"],["dog","dogs"],["mouse","mices"]]
 
   describe "computeConcrete" $ do
     context "with the toy morphology" $ do
 
       it "uses mkN with 1 argument" $
-        shelly (computeConcrete "gf" "test/ParadigmEng.gf" "mkN" ["\"mouse\""])
+        shellyNoDir (computeConcrete "gf" "test/ParadigmEng.gf" "mkN" ["\"mouse\""])
           `shouldReturn` ["mouse","mouses"]
       it "uses mkN with 2 argument" $
-        shelly (computeConcrete "gf" "test/ParadigmEng.gf" "mkN" ["\"mouse\"","\"mices\""])
+        shellyNoDir (computeConcrete "gf" "test/ParadigmEng.gf" "mkN" ["\"mouse\"","\"mices\""])
           `shouldReturn` ["mouse","mices"]
 
       it "uses mkV with 1 argument" $
-        shelly (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\""])
+        shellyNoDir (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\""])
           `shouldReturn` ["eat", "eated","eated"]
       it "uses mkV with 2 argument" $
-        shelly (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\"","\"ate\""])
+        shellyNoDir (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\"","\"ate\""])
           `shouldReturn` ["eat", "ate","ate"]
       it "uses mkV with 3 argument" $
-        shelly (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\"","\"ate\"","\"eaten\""])
+        shellyNoDir (computeConcrete "gf" "test/ParadigmEng.gf" "mkV" ["\"eat\"","\"ate\"","\"eaten\""])
           `shouldReturn` ["eat", "ate","eaten"]
   -- ~~~ Small experiments (integration tests) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   context "Toy experiment with english nouns" $ do
@@ -118,11 +118,11 @@ spec = do
                                 , setup = \[cat,cats] -> [[esc cat],[esc cat,esc cats]] }
     describe "word costs" $ do
         it "cat has cost 1" $
-          shelly (wordCost "gf" experiment ["cat", "cats"]) `shouldReturn` 1
+          shellyNoDir (wordCost "gf" experiment ["cat", "cats"]) `shouldReturn` 1
         it "dog has cost 1" $
-          shelly (wordCost "gf" experiment ["dog", "dogs"]) `shouldReturn` 1
+          shellyNoDir (wordCost "gf" experiment ["dog", "dogs"]) `shouldReturn` 1
         it "mouse has cost 2" $
-          shelly (wordCost "gf" experiment ["mouse", "mices"]) `shouldReturn` 2
+          shellyNoDir (wordCost "gf" experiment ["mouse", "mices"]) `shouldReturn` 2
     describe "runExperiment" $ do
       let report = ExperimentReport
                         { experiment   = "English nouns"
@@ -132,7 +132,8 @@ spec = do
                         , distribution = [2,1] }
 
       it "should produce the expected report" $
-        runExperiment defaultOptions experiment `shouldReturn` report
+        shellyNoDir (runExperiment defaultOptions experiment)
+          `shouldReturn` report
 
   context "Toy experiment with english verbs" $ do
     let experiment = Experiment { title = "English verbs"
@@ -147,11 +148,11 @@ spec = do
                                     , [esc eat, esc ate, esc eaten]] }
     describe "word costs" $ do
         it "pray has cost 1" $
-          shelly (wordCost "gf" experiment ["pray", "prayed", "prayed"]) `shouldReturn` 1
+          shellyNoDir (wordCost "gf" experiment ["pray", "prayed", "prayed"]) `shouldReturn` 1
         it "love has cost 2" $
-          shelly (wordCost "gf" experiment ["loved", "loved", "loved"]) `shouldReturn` 2
+          shellyNoDir (wordCost "gf" experiment ["loved", "loved", "loved"]) `shouldReturn` 2
         it "eat has cost 3" $
-          shelly (wordCost "gf" experiment ["eat","ate","eaten"]) `shouldReturn` 3
+          shellyNoDir (wordCost "gf" experiment ["eat","ate","eaten"]) `shouldReturn` 3
     describe "runExperiment" $ do
       let report = ExperimentReport { experiment   = "English verbs"
                                     , entries      = 3
@@ -160,7 +161,8 @@ spec = do
                                     , distribution = [1,1,1] }
 
       it "should produce the expected report" $
-        runExperiment defaultOptions experiment `shouldReturn` report
+        shellyNoDir (runExperiment defaultOptions experiment)
+          `shouldReturn` report
 
 getCosts :: Gen [Int]
 getCosts = listOf1 (elements [1..100])

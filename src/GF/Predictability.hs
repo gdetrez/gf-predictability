@@ -16,16 +16,17 @@ defaultMain ::  [Experiment] -> IO ()
 defaultMain experiments = do
     options <- getOptions
     setLogger options
-    shelly $ debug $ show options
-    reports <- mapM (runExperiment options) experiments
-    case htmlReport options of
-      Just p  -> shelly $ writefile p (makeHtmlReport reports)
-      Nothing -> return ()
-    case csvReport options of
-      Just p  -> shelly $ writefile p (makeCsvReport reports)
-      Nothing -> return ()
-    shelly $ notice ""
-    shelly $ notice $ take 36 (~~~) ++ " Results " ++ take 36 (~~~)
-    mapM_ (shelly . notice . ppReport) reports
-    shelly $ notice (take 79 (~~~))
+    shelly $ silently $ do
+      debug $ show options
+      reports <- mapM (runExperiment options) experiments
+      case htmlReport options of
+        Just p  -> writefile p (makeHtmlReport reports)
+        Nothing -> return ()
+      case csvReport options of
+        Just p  -> writefile p (makeCsvReport reports)
+        Nothing -> return ()
+      notice ""
+      notice $ take 36 (~~~) ++ " Results " ++ take 36 (~~~)
+      mapM_ (notice . ppReport) reports
+      notice (take 79 (~~~))
   where (~~~) = repeat '~'
