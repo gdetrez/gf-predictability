@@ -11,12 +11,12 @@ data Options = Options
   { gfBin       :: Maybe FilePath
   , priority    :: Priority
   , htmlReport  :: Maybe FilePath
-  , plotReport  :: Maybe FilePath
+  , csvReport   :: Maybe FilePath
   , limit       :: Maybe Int
   } deriving (Eq,Show)
 
 defaultOptions = Options  { gfBin = Nothing, priority = DEBUG
-                          , htmlReport = Nothing, plotReport = Nothing
+                          , htmlReport = Nothing, csvReport = Nothing
                           , limit = Nothing }
 
 parseVerbosity :: Parser Priority
@@ -40,9 +40,9 @@ parseOptions = Options
          <> help "Save a html formated report in HTML_FILE"
          <> reader (Right . fromString)))
       <*> optional (nullOption
-          ( long "plot-report"
-         <> metavar "PLOT_FILE"
-         <> help "Save values in PLOT_FILE to be ploted by jenkins"
+          ( long "csv-report"
+         <> metavar "CSV_FILE"
+         <> help "Save mean costs in a csv file to be ploted by jenkins"
          <> reader (Right . fromString)))
       <*> optional (option
           ( long "limit"

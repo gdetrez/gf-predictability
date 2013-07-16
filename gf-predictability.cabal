@@ -48,6 +48,7 @@ library
   other-modules:
     GF.Predictability.Experiments
     GF.Predictability.HtmlReport
+    GF.Predictability.CsvReport
     GF.Predictability.Logging
     GF.Predictability.Options
     GF.Predictability.Stats

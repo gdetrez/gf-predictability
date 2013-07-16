@@ -9,6 +9,7 @@ import System.Log.Logger (Priority(..))
 import GF.Predictability.Options
 import GF.Predictability.Logging
 import GF.Predictability.HtmlReport
+import GF.Predictability.CsvReport
 import Shelly
 
 defaultMain ::  [Experiment] -> IO ()
@@ -18,7 +19,10 @@ defaultMain experiments = do
     shelly $ debug $ show options
     reports <- mapM (runExperiment options) experiments
     case htmlReport options of
-      Just p -> shelly $ writefile p (makeHtmlReport reports)
+      Just p  -> shelly $ writefile p (makeHtmlReport reports)
+      Nothing -> return ()
+    case csvReport options of
+      Just p  -> shelly $ writefile p (makeCsvReport reports)
       Nothing -> return ()
     shelly $ notice ""
     shelly $ notice $ take 36 (~~~) ++ " Results " ++ take 36 (~~~)
