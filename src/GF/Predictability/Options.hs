@@ -12,6 +12,7 @@ data Options = Options
   , priority    :: Priority
   , htmlReport  :: Maybe FilePath
   , plotReport  :: Maybe FilePath
+  , limit       :: Maybe Int
   } deriving (Eq,Show)
 
 defaultOptions = Options  { gfBin = Nothing, priority = NOTICE
@@ -42,6 +43,10 @@ parseOptions = Options
          <> metavar "PLOT_FILE"
          <> help "Save values in PLOT_FILE to be ploted by jenkins"
          <> reader (Right . fromString)))
+      <*> optional (option
+          ( long "limit"
+         <> metavar "N"
+         <> help "limit the experiment to N lexicon entries"))
 
 getOptions :: IO Options
 getOptions = execParser opts

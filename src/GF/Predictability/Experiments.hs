@@ -48,11 +48,19 @@ makeReport e costs = ExperimentReport
 runExperiment :: Options -> Experiment -> IO ExperimentReport
 runExperiment opts e = shelly $ silently $ do
     notice $ "*** " ++ title e ++ " ***"
+    -- The first thing we do is to make sure we can find the gf binary.
+    -- Otherwise we exit with an error
     gf <- findGf (gfBin opts)
     notice $ "Using gf binary: " ++ show gf
+    -- Next we extract the lexicon from the ressource grammar
     lexicon <- getLexicon gf (lexicon e) (category e)
     notice $ show (length lexicon) ++ " entries found"
-    costs <- mapM (wordCost gf e) lexicon
+    -- if the `--limit` option has been set, we cut the lexicon
+    -- to the given value
+    let lexicon' = (maybe id take (limit opts)) lexicon
+    -- Compute the cost of all entries in the lexicon
+    costs <- mapM (wordCost gf e) lexicon'
+    -- Create and return an experiment report
     return $ makeReport e costs
 
 
@@ -102,18 +110,22 @@ esc t = LT.concat ["\"", t, "\""]
 -- | Extract a lexicon from the given gfo file for the given category
 getLexicon :: FilePath -> FilePath -> String -> Sh Lexicon
 getLexicon gf file cat = silently $ do
-    setStdin $ LT.pack ("gt -cat=" ++ cat ++ " | l -list")
+    debug $ "gf> " ++ gfcmd
+    setStdin $ LT.pack gfcmd
     output <- cmd gf "-run" file "+RTS" "-K32M" "-RTS"
     return $ filter (not.null) (map readLine (LT.lines output))
   where readLine line | LT.null line = []
                       | otherwise    = LT.splitOn ", " line
+        gfcmd = "gt -cat=" ++ cat ++ " | l -list"
 
 -- | Helper function that start a gf shell with the given gf/gfo file
 -- loaded using --retain and execute the given gf function using the 
 -- compute_concrete command
 computeConcrete :: FilePath -> FilePath -> LT.Text -> [LT.Text] -> Sh Word
 computeConcrete gf gfo oper args = silently $ do
-    setStdin gfcommand
+    debug $ "gf> " ++ LT.unpack gfcmd
+    setStdin gfcmd
     output <- cmd gf "--run" "--retain" gfo
+    debug $ "gf: " ++ LT.unpack (LT.intercalate ", " (LT.lines output))
     return (LT.lines output)
-  where gfcommand = LT.unwords ("cc":"-all":oper:args)
+  where gfcmd = LT.unwords ("cc":"-all":oper:args)
