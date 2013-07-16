@@ -7,7 +7,7 @@ module GF.Predictability.Experiments where
 import GF.Predictability.Stats
 import GF.Predictability.Types
 import Debug.Trace
-import qualified Data.Text.Lazy as LT
+import qualified Data.Text as T
 import Data.List (isPrefixOf)
 import GF.Predictability.Logging
 import GF.Predictability.Options
@@ -118,30 +118,30 @@ wordCost gf e w= do
   where sequences = setup e w
 
 esc :: Text -> Text
-esc t = LT.concat ["\"", t, "\""]
+esc t = T.concat ["\"", t, "\""]
 
 -- | Extract a lexicon from the given gfo file for the given category
 getLexicon :: FilePath -> FilePath -> String -> Int -> Sh Lexicon
 getLexicon gf file cat n = silently $ do
     debug $ "gf> " ++ gfcmd
-    setStdin $ LT.pack gfcmd
+    setStdin $ T.pack gfcmd
     output <- cmd gf "-run" file "+RTS" "-K32M" "-RTS"
-    return $ filter (not.null) (map (take n . readLine) (LT.lines output))
-  where readLine line | LT.null line = []
-                      | otherwise    = LT.splitOn ", " line
+    return $ filter (not.null) (map (take n . readLine) (T.lines output))
+  where readLine line | T.null line = []
+                      | otherwise    = T.splitOn ", " line
         gfcmd = "gt -cat=" ++ cat ++ " | l -list"
 
 -- | Helper function that start a gf shell with the given gf/gfo file
 -- loaded using --retain and execute the given gf function using the 
 -- compute_concrete command
-computeConcrete :: FilePath -> FilePath -> LT.Text -> [LT.Text] -> Sh Word
-computeConcrete gf gfo oper args = silently $ do
-    debug $ "gf> " ++ LT.unpack gfcmd
+computeConcrete :: FilePath -> FilePath -> T.Text -> [T.Text] -> Sh Word
+computeConcrete gf gfo oper args = do
+    debug $ "gf> " ++ T.unpack gfcmd
     setStdin gfcmd
     output <- cmd gf "--run" "--retain" gfo
-    debug $ "gf: " ++ LT.unpack (LT.intercalate ", " (LT.lines output))
-    return (LT.lines output)
-  where gfcmd = LT.unwords ("cc":"-all":oper:args)
+    debug $ "gf: " ++ T.unpack (T.intercalate ", " (T.lines output))
+    return (T.lines output)
+  where gfcmd = T.unwords ("cc":"-all":oper:args)
 
 -- | Pretty printing reports
 ppReport :: ExperimentReport -> String

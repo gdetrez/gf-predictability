@@ -6,14 +6,20 @@ import Text.Blaze.Html5
 import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Text
-import Data.Text.Lazy (Text)
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Text.Lazy as LT
 import Graphics.Rendering.HSparklines
 import System.IO.Unsafe
 import Data.String
 import Control.Monad (forM_)
 
 makeHtmlReport :: [ExperimentReport] -> Text
-makeHtmlReport = renderHtml . reportHtml
+makeHtmlReport = toStrict . renderHtml . reportHtml
+
+toStrict :: LT.Text -> Text
+toStrict = Text.concat . LT.toChunks
+
 
 reportHtml :: [ExperimentReport] -> Html
 reportHtml es = docTypeHtml $ do

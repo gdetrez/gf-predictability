@@ -6,7 +6,6 @@ import Test.QuickCheck
 --import Data.List (sort)
 import GF.Predictability.Experiments
 import Text.Blaze.Html.Renderer.String
-import Text.Regex
 import Data.List (isInfixOf)
 
 import GF.Predictability.HtmlReport -- SUT
