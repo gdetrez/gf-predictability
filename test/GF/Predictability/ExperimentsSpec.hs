@@ -132,7 +132,7 @@ spec = do
                         , distribution = [2,1] }
 
       it "should produce the expected report" $
-        shellyNoDir (runExperiment defaultOptions experiment)
+        shellyNoDir (runExperiment defaultOptions "gf" experiment)
           `shouldReturn` report
 
   context "Toy experiment with english verbs" $ do
@@ -161,7 +161,7 @@ spec = do
                                     , distribution = [1,1,1] }
 
       it "should produce the expected report" $
-        shellyNoDir (runExperiment defaultOptions experiment)
+        shellyNoDir (runExperiment defaultOptions "gf" experiment)
           `shouldReturn` report
 
 getCosts :: Gen [Int]

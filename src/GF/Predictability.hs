@@ -18,7 +18,11 @@ defaultMain experiments = do
     setLogger options
     shelly $ silently $ do
       debug $ show options
-      reports <- mapM (runExperiment options) experiments
+      -- The first thing we do is to make sure we can find the gf binary.
+      -- Otherwise we exit with an error
+      gf <- findGf (gfBin options)
+      notice $ "Using gf binary: " ++ show gf
+      reports <- mapM (runExperiment options gf) experiments
       case htmlReport options of
         Just p  -> writefile p (makeHtmlReport reports)
         Nothing -> return ()

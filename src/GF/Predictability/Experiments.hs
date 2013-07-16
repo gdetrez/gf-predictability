@@ -57,13 +57,9 @@ m2Percent er = round (fromIntegral (m2 er) / fromIntegral (entries er) * 100)
 
 
 
-runExperiment :: Options -> Experiment -> Sh ExperimentReport
-runExperiment opts e = do
+runExperiment :: Options -> FilePath -> Experiment -> Sh ExperimentReport
+runExperiment opts gf e = do
     notice $ "*** " ++ title e ++ " ***"
-    -- The first thing we do is to make sure we can find the gf binary.
-    -- Otherwise we exit with an error
-    gf <- findGf (gfBin opts)
-    notice $ "Using gf binary: " ++ show gf
     -- Next we extract the lexicon from the ressource grammar
     lexicon <- getLexicon gf (lexicon e) (category e) (nforms e)
     notice $ show (length lexicon) ++ " entries found"
