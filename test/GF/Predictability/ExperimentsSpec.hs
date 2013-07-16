@@ -106,8 +106,6 @@ spec = do
                         , entries      = 3
                         , meanCost     = 1.3333333333333333
                         , medianCost   = 1
-                        , m1           = 2
-                        , m2           = 3
                         , distribution = [2,1] }
 
       it "should produce the expected report" $
@@ -136,8 +134,6 @@ spec = do
                                     , entries      = 3
                                     , meanCost     = 2
                                     , medianCost   = 2
-                                    , m1           = 1
-                                    , m2           = 2
                                     , distribution = [1,1,1] }
 
       it "should produce the expected report" $

@@ -35,8 +35,6 @@ data ExperimentReport = ExperimentReport
   , entries      :: Int
   , meanCost     :: Double
   , medianCost   :: Double
-  , m1           :: Int
-  , m2           :: Int
   , distribution :: [Int] }
   deriving (Eq, Show)
 
@@ -46,11 +44,18 @@ makeReport e costs = ExperimentReport
   , entries      = length costs
   , meanCost     = mean fcosts
   , medianCost   = median fcosts
-  , m1           = count 1
-  , m2           = length (filter (<=2) costs)
   , distribution = map count [1..maximum costs] }
   where fcosts = map fromIntegral costs
         count x = length (filter (==x) costs)
+
+-- A few additional helpers for `ExperimentReport`s
+m1, m1Percent, m2, m2Percent :: ExperimentReport -> Int
+m1 = head . distribution
+m1Percent er = round (fromIntegral (m1 er) / fromIntegral (entries er) * 100)
+m2 = sum . take 2 . distribution
+m2Percent er = round (fromIntegral (m2 er) / fromIntegral (entries er) * 100)
+
+
 
 runExperiment :: Options -> Experiment -> IO ExperimentReport
 runExperiment opts e = shelly $ silently $ do

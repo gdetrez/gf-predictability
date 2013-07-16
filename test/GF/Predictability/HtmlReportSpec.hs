@@ -18,8 +18,6 @@ spec = do
           , entries      = 42
           , meanCost     = 1.42
           , medianCost   = 2
-          , m1           = 38
-          , m2           = 40
           , distribution = [38, 2, 1, 1] }
 
   describe "experimentTR" $ do
