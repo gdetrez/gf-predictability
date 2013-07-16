@@ -15,13 +15,20 @@ import Shelly
 import Prelude hiding (FilePath)
 
 data Experiment = Experiment
-  { title         :: String
-  , lexicon       :: FilePath
-  , category      :: String
-  , morphology    :: FilePath
-  , smartparadigm :: Oper
-  , setup         :: Word -> [[Text]] }
-
+  { title         :: String           -- ^ A title for the experiment
+  , lexicon       :: FilePath         -- ^ The gf grammar where the lexicon is
+  , category      :: String           -- ^ The gf category of the lexicon
+  , nforms        :: Int              -- ^ The number of forms to consider.
+                                      -- (It happens a lot that `l -list` and
+                                      -- `cc -all` returns a different number of
+                                      -- "forms" for the same lincat. This specify
+                                      -- how many are relevant (starting from the first)
+  , morphology    :: FilePath         -- ^ The gf file with the smartparadigms
+  , smartparadigm :: Oper             -- ^ The name of the smart paradigm under test
+  , setup         :: Word -> [[Text]] -- ^ Function that breaks an entry from the lexicon
+                                      -- into the successive lists of arguments to
+                                      -- be given to the smart paradigm,
+  }
 type ExperimentResult = [(String, Int)]
 data ExperimentReport = ExperimentReport
   { experiment   :: String
@@ -53,7 +60,7 @@ runExperiment opts e = shelly $ silently $ do
     gf <- findGf (gfBin opts)
     notice $ "Using gf binary: " ++ show gf
     -- Next we extract the lexicon from the ressource grammar
-    lexicon <- getLexicon gf (lexicon e) (category e)
+    lexicon <- getLexicon gf (lexicon e) (category e) (nforms e)
     notice $ show (length lexicon) ++ " entries found"
     -- if the `--limit` option has been set, we cut the lexicon
     -- to the given value
@@ -108,12 +115,12 @@ esc :: Text -> Text
 esc t = LT.concat ["\"", t, "\""]
 
 -- | Extract a lexicon from the given gfo file for the given category
-getLexicon :: FilePath -> FilePath -> String -> Sh Lexicon
-getLexicon gf file cat = silently $ do
+getLexicon :: FilePath -> FilePath -> String -> Int -> Sh Lexicon
+getLexicon gf file cat n = silently $ do
     debug $ "gf> " ++ gfcmd
     setStdin $ LT.pack gfcmd
     output <- cmd gf "-run" file "+RTS" "-K32M" "-RTS"
-    return $ filter (not.null) (map readLine (LT.lines output))
+    return $ filter (not.null) (map (take n . readLine) (LT.lines output))
   where readLine line | LT.null line = []
                       | otherwise    = LT.splitOn ", " line
         gfcmd = "gt -cat=" ++ cat ++ " | l -list"

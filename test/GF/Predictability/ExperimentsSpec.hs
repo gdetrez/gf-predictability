@@ -58,11 +58,11 @@ spec = do
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do
       it "get the lexicon for the V category" $
-        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "V")
+        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "V" 3)
           `shouldReturn` [["eat","ate","eaten"],["love","loved","loved"],["pray","prayed","prayed"]]
 
       it "gets the lexicon for the N category" $
-        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "N")
+        liftM sort (shelly $ getLexicon "gf" "test/LexiconEng.gf" "N" 2)
           `shouldReturn` [["cat","cats"],["dog","dogs"],["mouse","mices"]]
 
   describe "computeConcrete" $ do
@@ -89,6 +89,7 @@ spec = do
     let experiment = Experiment { title = "English nouns"
                                 , lexicon = "test/LexiconEng.gfo"
                                 , category = "N"
+                                , nforms        = 2
                                 , morphology = "test/ParadigmEng.gfo"
                                 , smartparadigm = "mkN"
                                 , setup = \[cat,cats] -> [[esc cat],[esc cat,esc cats]] }
@@ -116,6 +117,7 @@ spec = do
     let experiment = Experiment { title = "English verbs"
                                 , lexicon = "test/LexiconEng.gfo"
                                 , category = "V"
+                                , nforms        = 3
                                 , morphology = "test/ParadigmEng.gfo"
                                 , smartparadigm = "mkV"
                                 , setup = \[eat,ate,eaten] ->
