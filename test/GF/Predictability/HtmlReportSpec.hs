@@ -42,7 +42,8 @@ spec = do
       experimentTR testReport `shouldContain` "<td>2.0</td>"
 
     it "has cells with m1 and m2" $
-      experimentTR testReport `shouldContain` "<td>38</td><td>40</td>"
+      experimentTR testReport
+        `shouldContain` "<td><abbr title=\"38\">90%</abbr></td><td><abbr title=\"40\">95%</abbr></td>"
 
     it "has a cell containing an image" $
       experimentTR testReport `shouldContain` "<td><img"

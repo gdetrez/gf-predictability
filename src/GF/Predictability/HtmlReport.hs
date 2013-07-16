@@ -34,8 +34,8 @@ tableHeader = tr $ do
   th "entries"
   th "mean cost"
   th "median cost"
-  th ("m" >> sub "1")
-  th ("m" >> sub "2")
+  th ("m=1")
+  th ("m≤2 ")
   th "distribution"
 
 
@@ -47,11 +47,12 @@ experimentTR er = tr $ do
   td (toHtml (entries er))
   td (toHtml (meanCost er))
   td (toHtml (medianCost er))
-  td (toHtml (m1 er))
-  td (toHtml (m2 er))
+  td  $ abbr' (show (m1Percent er) ++ "%") (m1 er)
+  td  $ abbr' (show (m2Percent er) ++ "%") (m2 er)
   td (img ! src sparkline ! alt alttext ! A.style "vertical-align: 15px;")
   where sparkline = fromString (distributionSparkline er)
         alttext = fromString $ show (distribution er)
+        abbr' s1 s2 = abbr ! A.title (toValue s2) $ toHtml s1
 
 distributionSparkline :: ExperimentReport -> String
 distributionSparkline er = "data:image/png;base64," ++ str
