@@ -16,7 +16,8 @@ data Options = Options
   } deriving (Eq,Show)
 
 defaultOptions = Options  { gfBin = Nothing, priority = NOTICE
-                          , htmlReport = Nothing, plotReport = Nothing }
+                          , htmlReport = Nothing, plotReport = Nothing
+                          , limit = Nothing }
 
 parseVerbosity :: Parser Priority
 parseVerbosity =
