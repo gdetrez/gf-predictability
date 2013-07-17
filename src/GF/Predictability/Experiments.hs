@@ -51,9 +51,9 @@ makeReport e costs = ExperimentReport
 -- A few additional helpers for `ExperimentReport`s
 m1, m1Percent, m2, m2Percent :: ExperimentReport -> Int
 m1 = head . distribution
-m1Percent er = round (fromIntegral (m1 er) / fromIntegral (entries er) * 100)
+m1Percent er = floor (fromIntegral (m1 er) / fromIntegral (entries er) * 100)
 m2 = sum . take 2 . distribution
-m2Percent er = round (fromIntegral (m2 er) / fromIntegral (entries er) * 100)
+m2Percent er = floor (fromIntegral (m2 er) / fromIntegral (entries er) * 100)
 
 
 

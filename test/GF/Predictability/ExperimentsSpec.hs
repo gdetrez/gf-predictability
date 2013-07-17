@@ -76,7 +76,7 @@ spec = do
         `shouldSatisfy` isInfixOf "m=1: 33% (1)"
     it "prints the m<=2 value" $
       ppReport report
-        `shouldSatisfy` isInfixOf "m<=2: 67% (2)"
+        `shouldSatisfy` isInfixOf "m<=2: 66% (2)"
 
   describe "getLexicon" $ do
     context "Toy grammar LexiconEng" $ do
